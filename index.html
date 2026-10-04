@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cinematic Story Builder</title>
+<style>
+  :root{
+    --bg:#f3ece1; --panel:#ffffff; --panel2:#fbf6ee; --text:#2b1416;
+    --muted:#8a7267; --accent:#6e1423; --accent2:#9c6b1f; --border:#e2d4bf;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{margin:0; background:var(--bg); color:var(--text); font-family:'Georgia',serif;}
+  .wrap{max-width:720px;margin:0 auto;padding:28px 18px 60px;}
+  h1{font-size:1.5rem; letter-spacing:.08em; text-transform:uppercase; margin:0 0 4px; color:var(--accent2); font-weight:600;}
+  .sub{color:var(--muted); font-size:.85rem; margin-bottom:28px; font-family:sans-serif;}
+  label{display:block; font-size:.75rem; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); margin:18px 0 6px; font-family:sans-serif;}
+  select, input, textarea{width:100%; background:var(--panel); border:1px solid var(--border); color:var(--text); padding:11px 12px; border-radius:6px; font-size:.95rem; font-family:sans-serif;}
+  textarea{min-height:60px; resize:vertical;}
+  .row{display:flex; gap:12px;}
+  .row > div{flex:1;}
+  button{margin-top:22px; width:100%; padding:14px; border:none; border-radius:30px; background:linear-gradient(135deg,var(--accent),#4a0d16); color:#faf3e8; font-family:sans-serif; font-weight:600; letter-spacing:.05em; text-transform:uppercase; font-size:.85rem; cursor:pointer;}
+  button:disabled{opacity:.5;}
+  #output{margin-top:28px; background:var(--panel2); border:1px solid var(--border); border-radius:8px; padding:20px; display:none;}
+  .card-title{color:var(--accent); font-size:1.05rem; margin:0 0 10px; letter-spacing:.03em;}
+  .card-meta{font-family:sans-serif; font-size:.82rem; color:var(--muted); margin-bottom:14px; line-height:1.7;}
+  .card-meta b{color:var(--text);}
+  details{margin-top:6px;}
+  summary{font-family:sans-serif; font-size:.8rem; cursor:pointer; color:var(--accent2); letter-spacing:.03em;}
+  #full-prompt{white-space:pre-wrap; font-size:.9rem; line-height:1.55; margin-top:12px;}
+  .copy-btn, .again-btn{margin-top:14px; width:auto; display:inline-block; padding:10px 18px; border-radius:30px; font-size:.75rem;}
+  .again-btn{background:transparent; border:1px solid var(--accent); color:var(--accent);}
+  #status{margin-top:16px; font-family:sans-serif; color:var(--muted); font-size:.85rem; display:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Cinematic Story Builder</h1>
+  <div class="sub">by Amora Lune Atelier — turn one idea into a Seedance-ready mini-film</div>
+
+  <label for="genre">Genre</label>
+  <select id="genre">
+    <option value="drama">Drama</option>
+    <option value="comedy">Comedy</option>
+    <option value="thriller">Thriller</option>
+    <option value="action">Action</option>
+    <option value="horror">Horror</option>
+    <option value="romance">Romance</option>
+    <option value="mystery">Mystery</option>
+    <option value="scifi">Sci-Fi</option>
+    <option value="noir">Noir (black & white)</option>
+    <option value="90s">90s Nostalgia</option>
+    <option value="surprise">Surprise Me</option>
+  </select>
+
+  <div class="row">
+    <div>
+      <label for="length">Length</label>
+      <select id="length">
+        <option value="15">15 sec</option>
+        <option value="20">20 sec</option>
+        <option value="30" selected>30 sec</option>
+      </select>
+    </div>
+    <div>
+      <label for="chars">Characters</label>
+      <select id="chars">
+        <option value="1">1</option>
+        <option value="2" selected>2</option>
+        <option value="3">3</option>
+      </select>
+    </div>
+  </div>
+
+  <label for="ending">Story Ending</label>
+  <select id="ending">
+    <option value="">Surprise Me</option>
+    <option value="plot twist">Plot Twist</option>
+    <option value="cliffhanger">Cliffhanger</option>
+    <option value="revenge">Revenge</option>
+    <option value="emotional">Emotional</option>
+    <option value="funny">Funny</option>
+  </select>
+
+  <label for="world">Visual World / Setting</label>
+  <select id="world">
+    <option value="">Let Amora Choose</option>
+    <option value="luxury">Luxury</option>
+    <option value="city">City</option>
+    <option value="suburban">Suburban</option>
+    <option value="corporate">Corporate</option>
+    <option value="nightlife">Nightlife</option>
+    <option value="travel">Travel</option>
+  </select>
+
+  <label>Character Styling</label>
+  <div style="font-family:sans-serif; font-size:.9rem; margin-top:4px;">
+    <label style="display:flex; align-items:center; gap:8px; text-transform:none; letter-spacing:0; font-size:.9rem; margin-bottom:8px;">
+      <input type="radio" name="styling-mode" value="auto" checked style="width:auto;"> Let Amora choose, based on the story
+    </label>
+    <label style="display:flex; align-items:center; gap:8px; text-transform:none; letter-spacing:0; font-size:.9rem;">
+      <input type="radio" name="styling-mode" value="manual" style="width:auto;"> I want to choose
+    </label>
+  </div>
+
+  <div id="styling-manual-fields" style="display:none;">
+    <label for="styling">Wardrobe style</label>
+    <select id="styling">
+      <option value="oxblood signature">Oxblood Signature (Amora Lune Atelier)</option>
+      <option value="luxury evening">Luxury Evening</option>
+      <option value="casual chic">Casual Chic</option>
+      <option value="glam">Glam</option>
+      <option value="corporate power">Corporate Power</option>
+      <option value="custom">Custom</option>
+    </select>
+    <textarea id="styling-custom" placeholder="e.g. red leather trench, gold hardware" style="display:none;margin-top:8px;"></textarea>
+
+    <label for="hair">Hair</label>
+    <select id="hair">
+      <option value="">Let Amora Choose</option>
+      <option value="90s blowout">90s Salon Blowout</option>
+      <option value="sleek ponytail">Sleek Ponytail</option>
+      <option value="soft waves">Soft Waves</option>
+      <option value="custom">Custom</option>
+    </select>
+    <textarea id="hair-custom" placeholder="e.g. slicked back bun" style="display:none;margin-top:8px;"></textarea>
+
+    <label for="makeup">Makeup</label>
+    <select id="makeup">
+      <option value="">Let Amora Choose</option>
+      <option value="soft glam">Soft Glam</option>
+      <option value="bold red lip">Bold Red Lip</option>
+      <option value="natural dewy">Natural Dewy</option>
+      <option value="custom">Custom</option>
+    </select>
+    <textarea id="makeup-custom" placeholder="e.g. smoky eye, nude lip" style="display:none;margin-top:8px;"></textarea>
+  </div>
+
+  <label for="topic">Your idea (optional — leave blank and Amora invents one)</label>
+  <textarea id="topic" placeholder="e.g. a drama about someone who passed away"></textarea>
+
+  <button id="go">Create My Cinematic Story</button>
+  <div id="status">Writing your cinematic story…</div>
+  <div id="output"></div>
+</div>
+
+<script>
+['styling','hair','makeup'].forEach(field => {
+  document.getElementById(field).addEventListener('change', (e) => {
+    const customBox = document.getElementById(field + '-custom');
+    customBox.style.display = e.target.value === 'custom' ? 'block' : 'none';
+  });
+});
+
+document.querySelectorAll('input[name="styling-mode"]').forEach(radio => {
+  radio.addEventListener('change', (e) => {
+    document.getElementById('styling-manual-fields').style.display = e.target.value === 'manual' ? 'block' : 'none';
+  });
+});
+
+function fieldValue(name) {
+  const select = document.getElementById(name).value;
+  if (select === 'custom') return document.getElementById(name + '-custom').value.trim();
+  return select;
+}
+
+document.getElementById('go').addEventListener('click', async () => {
+  const genre = document.getElementById('genre').value;
+  const length = document.getElementById('length').value;
+  const chars = document.getElementById('chars').value;
+  const ending = document.getElementById('ending').value;
+  const world = document.getElementById('world').value;
+  const topic = document.getElementById('topic').value.trim();
+  const manualStyling = document.querySelector('input[name="styling-mode"]:checked').value === 'manual';
+  const wardrobe = manualStyling ? fieldValue('styling') : '';
+  const hair = manualStyling ? fieldValue('hair') : '';
+  const makeup = manualStyling ? fieldValue('makeup') : '';
+  const btn = document.getElementById('go');
+  const status = document.getElementById('status');
+  const output = document.getElementById('output');
+
+  btn.disabled = true;
+  status.style.display = 'block';
+  output.style.display = 'none';
+  output.innerHTML = '';
+
+  try {
+    const response = await fetch("/api/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ genre, length, chars, ending, world, wardrobe, hair, makeup, topic })
+    });
+    const data = await response.json();
+
+    if (!response.ok) {
+      output.innerHTML = '<div class="card-meta">Error: ' + (data.error || 'unknown') + '<br>' + JSON.stringify(data.detail || '') + '</div>';
+      output.style.display = 'block';
+      return;
+    }
+
+    const text = data.text || '';
+    if (!text) {
+      output.innerHTML = '<div class="card-meta">No output returned — try again.</div>';
+    } else {
+      const lines = text.trim().split('\n');
+      const title = (lines[0] || 'YOUR CINEMATIC STORY').replace(/^#+\s*/, '').trim();
+      const body = lines.slice(1).join('\n').trim();
+      const genreLabel = document.getElementById('genre').selectedOptions[0].text;
+      output.innerHTML = `
+        <div class="card-title">YOUR CINEMATIC STORY IS READY 🎬</div>
+        <div class="card-meta">
+          <b>Title:</b> ${title}<br>
+          <b>Genre:</b> ${genreLabel}<br>
+          <b>Duration:</b> ${length} sec<br>
+          <b>Characters:</b> ${chars}
+        </div>
+        <details><summary>View full Seedance prompt</summary><div id="full-prompt"></div></details>
+        <button class="copy-btn" id="copy-btn" type="button">Copy Seedance Prompt</button>
+        <button class="again-btn" id="again-btn" type="button">Create Another Story</button>
+      `;
+      document.getElementById('full-prompt').textContent = body;
+      document.getElementById('copy-btn').addEventListener('click', () => {
+        navigator.clipboard.writeText(body).then(() => {
+          document.getElementById('copy-btn').textContent = 'Copied!';
+        });
+      });
+      document.getElementById('again-btn').addEventListener('click', () => {
+        output.style.display = 'none';
+        document.getElementById('topic').value = '';
+      });
+    }
+    output.style.display = 'block';
+  } catch (err) {
+    output.innerHTML = '<div class="card-meta">Something went wrong: ' + String(err) + '</div>';
+    output.style.display = 'block';
+  } finally {
+    status.style.display = 'none';
+    btn.disabled = false;
+  }
+});
+</script>
+</body>
+</html>

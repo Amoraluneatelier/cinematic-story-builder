@@ -116,7 +116,7 @@ Output ONLY the finished prompt text, in this exact structure. No preamble, no e
       },
       body: JSON.stringify({
         model: "claude-sonnet-4-6",
-        max_tokens: 1000,
+        max_tokens: 1500,
         system: STYLE_GUIDE,
         messages: [{ role: "user", content: userPrompt }]
       })

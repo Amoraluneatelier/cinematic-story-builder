@@ -1,3 +1,4 @@
+export const config = { maxDuration: 60 };
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -116,7 +117,7 @@ Output ONLY the finished prompt text, in this exact structure. No preamble, no e
       },
       body: JSON.stringify({
         model: "claude-sonnet-4-6",
-        max_tokens: 1500,
+        max_tokens: 2000,
         system: STYLE_GUIDE,
         messages: [{ role: "user", content: userPrompt }]
       })

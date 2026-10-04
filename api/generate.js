@@ -122,12 +122,15 @@ Output ONLY the finished prompt text, in this exact structure. No preamble, no e
       })
     });
     const data = await response.json();
+    if (!response.ok) {
+      return res.status(500).json({ error: 'Anthropic error', status: response.status, detail: data });
+    }
     const text = (data.content || [])
       .map(block => block.type === "text" ? block.text : "")
       .filter(Boolean)
       .join("\n");
     return res.status(200).json({ text });
   } catch (err) {
-    return res.status(500).json({ error: 'Generation failed' });
+    return res.status(500).json({ error: 'Generation failed', detail: String(err) });
   }
 }

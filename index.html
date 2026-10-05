@@ -32,6 +32,7 @@
   .copy-btn, .again-btn{margin-top:14px; width:auto; display:inline-block; padding:10px 18px; border-radius:30px; font-size:.75rem;}
   .again-btn{background:transparent; border:1px solid var(--accent); color:var(--accent);}
   #status{margin-top:16px; font-family:sans-serif; color:var(--muted); font-size:.85rem; display:none;}
+  .hint{font-family:sans-serif; font-size:.72rem; color:var(--muted); margin-top:-2px; margin-bottom:6px;}
 </style>
 </head>
 <body>
@@ -71,6 +72,18 @@
         <option value="3">3</option>
       </select>
     </div>
+  </div>
+
+  <div id="char2-field" style="display:none;">
+    <label for="char2">Character 2 (optional — leave blank and Amora invents them)</label>
+    <div class="hint">e.g. her skeptical best friend, early 30s, no-nonsense energy</div>
+    <textarea id="char2" placeholder="Describe who this character is"></textarea>
+  </div>
+
+  <div id="char3-field" style="display:none;">
+    <label for="char3">Character 3 (optional — leave blank and Amora invents them)</label>
+    <div class="hint">e.g. a strict landlord, stern and unimpressed</div>
+    <textarea id="char3" placeholder="Describe who this character is"></textarea>
   </div>
 
   <label for="ending">Story Ending</label>
@@ -146,6 +159,14 @@
 </div>
 
 <script>
+function updateCharFields() {
+  const chars = parseInt(document.getElementById('chars').value, 10);
+  document.getElementById('char2-field').style.display = chars >= 2 ? 'block' : 'none';
+  document.getElementById('char3-field').style.display = chars >= 3 ? 'block' : 'none';
+}
+document.getElementById('chars').addEventListener('change', updateCharFields);
+updateCharFields();
+
 ['styling','hair','makeup'].forEach(field => {
   document.getElementById(field).addEventListener('change', (e) => {
     const customBox = document.getElementById(field + '-custom');
@@ -169,6 +190,8 @@ document.getElementById('go').addEventListener('click', async () => {
   const genre = document.getElementById('genre').value;
   const length = document.getElementById('length').value;
   const chars = document.getElementById('chars').value;
+  const char2 = document.getElementById('char2').value.trim();
+  const char3 = document.getElementById('char3').value.trim();
   const ending = document.getElementById('ending').value;
   const world = document.getElementById('world').value;
   const topic = document.getElementById('topic').value.trim();
@@ -189,7 +212,7 @@ document.getElementById('go').addEventListener('click', async () => {
     const response = await fetch("/api/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ genre, length, chars, ending, world, wardrobe, hair, makeup, topic })
+      body: JSON.stringify({ genre, length, chars, char2, char3, ending, world, wardrobe, hair, makeup, topic })
     });
     const data = await response.json();
 

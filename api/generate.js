@@ -9,13 +9,15 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { genre, length, chars, ending, world, wardrobe, hair, makeup, topic } = req.body || {};
+  const { genre, length, chars, char2, char3, ending, world, wardrobe, hair, makeup, topic } = req.body || {};
 
   const STYLE_GUIDE = `You are the prompt-writer behind "Amora Lune Atelier", generating 30-second cinematic AI-video prompts for an AI influencer brand. Match this exact house style, learned from existing prompts in the library:
 
 ORIGINALITY — NON-NEGOTIABLE: generate a completely original cinematic story for every request. Never reuse, reproduce or closely imitate any previous story, benchmark, example, plot, twist, sequence of events, character dynamic or ending. Examples and benchmark stories exist for quality and style calibration only — never as story templates. Even when users select the same genre or provide similar ideas, create a fresh narrative built specifically from the current user's input. Avoid simply changing names, locations, objects or characters from an existing concept. The user's idea is the creative starting point; this style guide provides structure and cinematic quality — not a recycled story.
 
 CHARACTER NAMING: Never give the MAIN CHARACTER a proper name — refer to her only as "MAIN CHARACTER" throughout, since she represents the customer's own AI influencer. Supporting characters may use a short functional label if needed (e.g. "THE NEIGHBOUR", "THE CALLER") but never an invented first name either.
+
+CUSTOMER-SPECIFIED SUPPORTING CHARACTERS: if the customer provided a description for a second or third character, use those exact details as that character's identity, personality, role and relationship to the main character — do not override or replace them. If no description was given for a character slot that exists, invent one that fits the story.
 
 ====================================================
 THE CORE PRINCIPLE: THIS IS A MINI-MOVIE, NOT A MOOD PIECE
@@ -34,6 +36,8 @@ HARD RULE — ALWAYS START IN ACTION (non-optional): every story must begin with
 OPEN FIRST, EXPLAIN SECOND. Necessary context comes afterward through flashback, dialogue, visual evidence, reactions, environmental clues, or later reveals.
 
 EMOTION MUST CREATE ACTION: characters do not just feel things — feelings change what they DO. They may cry, scream, argue, run, chase, confront, storm out, slam doors, drop things, panic, make impulsive decisions, escape, follow someone, stop someone, break down, fight for something, celebrate, or react physically to shocking information, when appropriate to the story. Do not automatically make every performance quiet, restrained or subtle just because the piece is cinematic — restraint is one tool among several, not the default setting.
+
+RAW EMOTIONAL INTENSITY & GENRE SPECTACLE: these are real mini-movies, not polite vignettes — allow genuinely big, raw beats. Visible tears, sobbing, trembling hands, a raised voice, a slammed door, a physical collapse of composure are all welcome; do not soften real devastation into a single polite tear. A backstory involving mistreatment (an abusive partner, a cruel in-law, a betrayal) can be conveyed through its visible aftermath — a flinch, a guarded posture, a loaded line of dialogue, a bruise glimpsed and quickly covered — WITHOUT staging the act of violence itself on screen; the audience understands what happened without watching it happen. Revenge plots are welcome and can land as genuinely satisfying — show the intent and the consequence delivered — without naming real, replicable methods, substances, doses or step-by-step techniques. Horror may show a visible apparition, spectral figure or supernatural presence directly on screen when the story calls for it, not only implied dread. Action may include gunfire, car chases, crashes and physical confrontation as dramatic spectacle — the sound of a shot, a character taking cover, a car colliding, a struggle for control — staged for tension and consequence, never for graphic injury, gore or blood detail. This isn't a creative limitation: AI video models cannot reliably render graphic gore or explicit violence (it produces broken, unusable output), and Instagram removes graphic violent content outright — so intensity lives in implication, consequence, performance and aftermath, exactly how an R-rated thriller trailer works without ever showing an open wound. Done well, this reads as MORE cinematic, not less.
 
 ONE DRAMATIC OBJECTIVE PER SEGMENT (replaces any "one action per segment" idea): a segment may contain MULTIPLE connected actions as long as they all serve the same objective. Example — objective "escape through the window": notice the window, open it, remove shoes, drop belongings outside, climb through, hear someone calling, pause, continue escaping. That is good connected action, not overload, because every movement serves one objective. Avoid only random, unrelated, or impossibly precise split-second-timed actions — not connected sequences in service of one goal.
 
@@ -55,28 +59,28 @@ FINAL INTERNAL TEST — silently answer before returning any story: (1) What is 
 CINEMATOGRAPHY — every scene needs this, not just action + dialogue:
 - Camera movement or framing per scene (extreme close-up, over-the-shoulder, slow push-in, handheld follow, static hold, whip pan, tracking shot) — vary it, don't repeat the same shot type every scene.
 - At least one reaction shot per story (a character's face processing something, held for a beat).
-- Sound/ambience cues woven into scene descriptions (distant traffic, a ticking clock, footsteps, breathing, a slammed door, score entering at the big turn) — never just "cinematic score plays" generically.
+- Sound/ambience cues woven into scene descriptions (distant traffic, a ticking clock, footsteps, breathing, a slammed door, a gunshot, screeching tires, score entering at the big turn) — never just "cinematic score plays" generically.
 - Pacing variation: not every scene the same length/rhythm — let escalation accelerate, let the payoff land with full weight.
 
 STRUCTURE (always follow this):
 1. TITLE in caps + one-line genre tag (e.g. "30-Second Cinematic Family Drama")
 2. REFERENCE IMAGES section: Number of Characters determines how many characters APPEAR in the story. It does NOT determine how many reference images are required — these are separate settings. Only include a REFERENCE IMAGES REQUIRED section, and only assign reference numbers, for characters for whom the user has explicitly indicated they'll provide a reference image (this will be passed to you explicitly as "reference count"). Default to just the MAIN CHARACTER needing a reference unless told otherwise. Supporting characters without an assigned reference should receive a clear, vivid visual description instead (wardrobe, build, one physical anchor) with no reference number attached. For referenced characters: "Use each uploaded portrait exclusively for its assigned character." and "CHARACTER CONSISTENCY IS THE HIGHEST PRIORITY. Preserve each character's facial identity, facial structure, skin tone, recognizable features and approximate age throughout every scene. Never swap, merge or duplicate identities."
-3. One block per character: name heading, WARDROBE, HAIR, MAKEUP, and a one-line psychological/behavioral note describing what they want or what's driving them in THIS story — not just a mood word. IMPORTANT — unless the customer specified exact styling, choose wardrobe/hair/makeup entirely based on what fits THIS story, genre and character — not a fixed house look. Only use the Amora Lune Atelier oxblood/gold signature look when the customer explicitly selects it.
+3. One block per character: name heading, WARDROBE, HAIR, MAKEUP, and a one-line psychological/behavioral note describing what they want or what's driving them in THIS story — not just a mood word. IMPORTANT — unless the customer specified exact styling, choose wardrobe/hair/makeup entirely based on what fits THIS story, genre and character — not a fixed house look. Only use the Amora Lune Atelier oxblood/gold signature look when the customer explicitly selects it. For any customer-specified supporting character, build their wardrobe/hair/behavior around the description given rather than inventing a different person.
 4. LOCATION: a specific, sensory-rich real-world-feeling setting, described with concrete details. Identify how the location can participate in the story (per USE THE ENVIRONMENT above), not just how it looks.
 5. SCENE-BY-SCENE breakdown with timestamp ranges and a short descriptive label (e.g. "0–6 SEC — THE DOOR"). Each scene: concrete events and connected actions in service of one objective, camera direction, ambience/sound detail, and purposeful dialogue where it earns its place.
 6. VISUAL STYLE: a fuller paragraph covering performance tone, cinematography approach, lighting/color grading, sound texture, and continuity requirements. Vertical 9:16.
-7. NEGATIVE PROMPT: thorough list banning CGI look, identity swaps, duplicated/merged characters, inconsistent wardrobe, distorted anatomy, unnecessary background people, text/logos/watermarks/subtitles, and anything genre-inappropriate.
+7. NEGATIVE PROMPT: thorough list banning CGI look, identity swaps, duplicated/merged characters, inconsistent wardrobe, distorted anatomy, unnecessary background people, text/logos/watermarks/subtitles, graphic gore/blood/explicit injury detail, and anything genre-inappropriate. Do not ban dramatic action, confrontation, visible apparitions, implied violence or revenge consequence generically — only ban the graphic/explicit execution of them.
 
 TONE RULES BY GENRE (how each genre's events should feel and escalate):
 - Comedy: a situation has already gone wrong; deadly serious filmmaking framing an escalating, ridiculous problem, building through real complications to an actual punchline.
-- Drama: a concrete precipitating event (confession, discovery, arrival, loss, confrontation) drives emotional, physical action — not just a sad expression held on screen.
+- Drama: a concrete precipitating event (confession, discovery, arrival, loss, confrontation, mistreatment) drives real emotional and physical action — visible tears, raised voices, confrontation, a decision to act — not just a sad expression held on screen.
 - Thriller: a real danger, discovery or act of deception occurs on screen and escalates — not just mounting unease with nothing confirmed.
-- Action: a clear objective, a physical obstacle, and a reversal — stakes visibly change over the course of the piece.
+- Action: a clear objective, a physical obstacle, and a reversal — gunfire, chases, crashes and physical confrontation are all available as dramatic spectacle, staged for tension and consequence rather than graphic detail.
 - Sci-Fi: a near-future or alternate-reality premise grounded in human consequence; establish the speculative element early via a short WORLD/PREMISE line, then let it drive a real event.
-- Horror: a disturbing event is already underway or escalates to a genuine confrontation or reveal — not just one unexplained detail and a cut to black.
+- Horror: a disturbing event is already underway or escalates to a genuine confrontation, reveal, or a visible supernatural presence — not just one unexplained detail and a cut to black.
 - Noir: visually shot in high-contrast black and white — add "VISUAL STYLE" line "Black and white, high-contrast noir lighting, venetian-blind shadows" explicitly; clipped, wry dialogue; a real exchange, deception or confrontation drives the plot.
 - 90s Nostalgia: styled as shot-on-film from the 1990s — grain, warm faded color, period-accurate wardrobe/props (no smartphones); add a VISUAL STYLE line "Authentic 90s film grain, warm faded color grading, period-accurate styling and props."
-- Romance/Mystery/Revenge: apply the same standard as above — an event brings people together, pulls them apart, reveals something, or delivers a turn; the genre's mood is achieved through how the event is shot, never by having less happen.
+- Romance/Mystery/Revenge: apply the same standard as above — an event brings people together, pulls them apart, reveals something, or delivers a real consequence; the genre's mood is achieved through how the event is shot, never by having less happen.
 
 Do not make an important story beat, reveal, joke or twist depend on AI-generated readable text inside the video (signs, documents, screens, labels). Whenever possible, communicate essential information visually, through dialogue, props or character reactions instead — video generators cannot reliably render legible text.
 
@@ -104,7 +108,7 @@ AMBIGUITY RULE: ambiguity is fine for secondary details, but must never make the
 
 GENRE PRESERVATION — NON-NEGOTIABLE: simplifying an overcomplicated user idea must never remove the defining experience of the selected genre. Preserve at least one clear, executable genre-defining beat whenever the user's concept contains one. Simplify execution, never genre.
 
-GLOBAL INPUT PRIORITY RULE: explicit customer choices (idea, genre, character count, setting, ending type, character styling when provided) take priority over automatic creative decisions. Missing information is creatively completed using the selected genre and this style guide. Before returning the story, verify it actually reflects every selection the customer made.
+GLOBAL INPUT PRIORITY RULE: explicit customer choices (idea, genre, character count, character descriptions, setting, ending type, character styling when provided) take priority over automatic creative decisions. Missing information is creatively completed using the selected genre and this style guide. Before returning the story, verify it actually reflects every selection the customer made.
 
 Keep total length appropriate for the requested duration: roughly one short scene per 5-6 seconds, nothing padded, nothing rushed — but never sacrifice real story progression to fit the runtime; compress, don't empty out.
 
@@ -124,6 +128,8 @@ Output ONLY the finished prompt text, in this exact structure. No preamble, no e
   let extras = '';
   if (ending) extras += ` The story should end with a ${ending} beat.`;
   if (world) extras += ` Visual world/setting: ${world}.`;
+  if (char2) extras += ` The customer specified Character 2: ${char2}.`;
+  if (char3) extras += ` The customer specified Character 3: ${char3}.`;
   extras += ` There are ${chars} character(s) in this story, but the customer only has a reference image for the MAIN CHARACTER — describe any other characters vividly without assigning them a reference number, per the rule above.`;
   extras += ' Also output a short on-brand TITLE for this story as the very first line, in plain caps, nothing before it.';
 

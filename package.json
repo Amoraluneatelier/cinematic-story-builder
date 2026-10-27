@@ -1,5 +1,8 @@
 {
-  "name": "cinematic-story-builder-backend",
+  "name": "cinematic-story-builder",
   "version": "1.0.0",
-  "private": true
+  "private": true,
+  "dependencies": {
+    "@vercel/kv": "latest"
+  }
 }

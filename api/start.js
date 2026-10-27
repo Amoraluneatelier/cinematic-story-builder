@@ -1,5 +1,6 @@
 import { kv } from '@vercel/kv';
 import crypto from 'crypto';
+import { waitUntil } from '@vercel/functions';
 
 export const config = { maxDuration: 60 };
 
@@ -220,12 +221,11 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Storage not configured', detail: String(err) });
   }
 
-  res.status(200).json({ jobId });
+  waitUntil(
+    runGeneration(params)
+      .then(text => kv.set(jobId, { status: 'done', text }, { ex: 3600 }))
+      .catch(err => kv.set(jobId, { status: 'error', error: String(err && err.message ? err.message : err) }, { ex: 3600 }))
+  );
 
-  try {
-    const text = await runGeneration(params);
-    await kv.set(jobId, { status: 'done', text }, { ex: 3600 });
-  } catch (err) {
-    await kv.set(jobId, { status: 'error', error: String(err && err.message ? err.message : err) }, { ex: 3600 });
-  }
+  return res.status(200).json({ jobId });
 }

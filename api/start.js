@@ -269,13 +269,13 @@ Format the TITLE line as: "EPISODE ${episodeNumber} — [on-brand title]" in pla
 }
 
 async function runGeneration(params) {
-  let seriesPlan = params.seriesPlan || '';
-  if (params.mode === 'series' && Number(params.episodeNumber) === 1 && !seriesPlan) {
-    seriesPlan = await generateSeriesPlan(params);
+  if (params.mode === 'series-plan') {
+    const planText = await generateSeriesPlan(params);
+    return { text: planText, seriesPlan: planText };
   }
-  const { system, userPrompt } = buildPrompt({ ...params, seriesPlan });
+  const { system, userPrompt } = buildPrompt(params);
   const text = await callAnthropic(system, userPrompt, 2000);
-  return { text, seriesPlan };
+  return { text, seriesPlan: params.seriesPlan || '' };
 }
 
 export default async function handler(req, res) {

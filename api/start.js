@@ -162,34 +162,46 @@ function buildSeriesPlanUserPrompt(params) {
   return userPrompt;
 }
 
-async function callAnthropic(system, userPrompt, maxTokens) {
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": process.env.ANTHROPIC_API_KEY,
-      "anthropic-version": "2023-06-01"
-    },
-    body: JSON.stringify({
-      model: "claude-sonnet-4-6",
-      max_tokens: maxTokens,
-      system,
-      messages: [{ role: "user", content: userPrompt }]
-    })
-  });
+async function callAnthropic(system, userPrompt, maxTokens, label) {
+  console.log(`[anthropic:${label}] request start, maxTokens=${maxTokens}, hasKey=${!!process.env.ANTHROPIC_API_KEY}`);
+  const t0 = Date.now();
+  let response;
+  try {
+    response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": process.env.ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01"
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-6",
+        max_tokens: maxTokens,
+        system,
+        messages: [{ role: "user", content: userPrompt }]
+      })
+    });
+  } catch (fetchErr) {
+    console.error(`[anthropic:${label}] fetch itself threw after ${Date.now() - t0}ms`, fetchErr && fetchErr.stack ? fetchErr.stack : fetchErr);
+    throw fetchErr;
+  }
+  console.log(`[anthropic:${label}] response received after ${Date.now() - t0}ms, status=${response.status}`);
   const data = await response.json();
   if (!response.ok) {
+    console.error(`[anthropic:${label}] non-ok response`, JSON.stringify(data));
     throw new Error('Anthropic error: ' + JSON.stringify(data));
   }
-  return (data.content || [])
+  const text = (data.content || [])
     .map(block => block.type === "text" ? block.text : "")
     .filter(Boolean)
     .join("\n");
+  console.log(`[anthropic:${label}] success, text length=${text.length}`);
+  return text;
 }
 
 async function generateSeriesPlan(params) {
   const userPrompt = buildSeriesPlanUserPrompt(params);
-  return callAnthropic(SERIES_PLANNER_PROMPT, userPrompt, 900);
+  return callAnthropic(SERIES_PLANNER_PROMPT, userPrompt, 900, 'series-plan');
 }
 
 function buildPrompt(params) {
@@ -269,12 +281,13 @@ Format the TITLE line as: "EPISODE ${episodeNumber} — [on-brand title]" in pla
 }
 
 async function runGeneration(params) {
+  console.log('[runGeneration] mode=', params.mode, 'episodeNumber=', params.episodeNumber);
   if (params.mode === 'series-plan') {
     const planText = await generateSeriesPlan(params);
     return { text: planText, seriesPlan: planText };
   }
   const { system, userPrompt } = buildPrompt(params);
-  const text = await callAnthropic(system, userPrompt, 2000);
+  const text = await callAnthropic(system, userPrompt, 2000, params.mode || 'single');
   return { text, seriesPlan: params.seriesPlan || '' };
 }
 
@@ -289,18 +302,36 @@ export default async function handler(req, res) {
 
   const params = req.body || {};
   const jobId = crypto.randomUUID();
+  console.log('[handler]', jobId, 'new job, mode=', params.mode);
 
   try {
     await kv.set(jobId, { status: 'pending' }, { ex: 3600 });
+    console.log('[handler]', jobId, 'kv set to pending OK');
   } catch (err) {
+    console.error('[handler]', jobId, 'kv set to pending FAILED', err && err.stack ? err.stack : err);
     return res.status(500).json({ error: 'Storage not configured', detail: String(err) });
   }
 
   waitUntil(
-    runGeneration(params)
-      .then(result => kv.set(jobId, { status: 'done', text: result.text, seriesPlan: result.seriesPlan }, { ex: 3600 }))
-      .catch(err => kv.set(jobId, { status: 'error', error: String(err && err.message ? err.message : err) }, { ex: 3600 }))
+    (async () => {
+      console.log('[background]', jobId, 'background task starting');
+      try {
+        const result = await runGeneration(params);
+        console.log('[background]', jobId, 'runGeneration succeeded, text length=', (result.text || '').length);
+        await kv.set(jobId, { status: 'done', text: result.text, seriesPlan: result.seriesPlan }, { ex: 3600 });
+        console.log('[background]', jobId, 'kv set to done OK');
+      } catch (err) {
+        console.error('[background]', jobId, 'FAILED', err && err.stack ? err.stack : err);
+        try {
+          await kv.set(jobId, { status: 'error', error: String(err && err.message ? err.message : err) }, { ex: 3600 });
+          console.log('[background]', jobId, 'kv set to error OK');
+        } catch (kvErr) {
+          console.error('[background]', jobId, 'ALSO FAILED TO WRITE ERROR STATUS TO KV', kvErr && kvErr.stack ? kvErr.stack : kvErr);
+        }
+      }
+    })()
   );
 
+  console.log('[handler]', jobId, 'returning jobId to client now');
   return res.status(200).json({ jobId });
-}
+    }

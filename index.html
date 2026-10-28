@@ -543,6 +543,50 @@ function saveSeriesState(state) {
   localStorage.setItem('activeSeriesJob', JSON.stringify(state));
 }
 
+async function runSeriesPlanning(state) {
+  const status = document.getElementById('series-status');
+  const btn = document.getElementById('series-go');
+  status.style.display = 'block';
+  status.textContent = 'Planning your series…';
+  btn.disabled = true;
+
+  let planJobId = state.planJobId;
+  if (!planJobId) {
+    try {
+      const startRes = await fetch('/api/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mode: 'series-plan', genre: state.genre, chars: state.chars,
+          char2: state.char2, char3: state.char3, ending: state.ending, world: state.world,
+          topic: state.topic, totalEpisodes: state.totalEpisodes
+        })
+      });
+      const startData = await startRes.json();
+      if (!startRes.ok || !startData.jobId) {
+        seriesError(startData.error || 'Could not start planning');
+        return;
+      }
+      planJobId = startData.jobId;
+      state.planJobId = planJobId;
+      saveSeriesState(state);
+    } catch (err) {
+      seriesError(String(err));
+      return;
+    }
+  }
+
+  pollJob(planJobId, {
+    onDone: (data) => {
+      state.seriesPlan = data.text || '';
+      state.planJobId = null;
+      saveSeriesState(state);
+      runSeriesEpisode(state);
+    },
+    onError: (err) => seriesError(err)
+  });
+}
+
 async function runSeriesEpisode(state) {
   const status = document.getElementById('series-status');
   const btn = document.getElementById('series-go');
@@ -587,7 +631,6 @@ async function runSeriesEpisode(state) {
 
       state.episodes = state.episodes || [];
       state.episodes.push({ episodeNum: state.currentEpisode, title, body });
-      state.seriesPlan = data.seriesPlan || state.seriesPlan;
 
       const nextEpisode = state.currentEpisode + 1;
       if (nextEpisode > state.totalEpisodes) {
@@ -624,10 +667,10 @@ document.getElementById('series-go').addEventListener('click', () => {
 
   const state = {
     genre, length, totalEpisodes, chars, char2, char3, ending, world, wardrobe, hair, makeup, topic,
-    currentEpisode: 1, previousEpisodeText: '', seriesPlan: '', jobId: null, episodes: []
+    currentEpisode: 1, previousEpisodeText: '', seriesPlan: '', planJobId: null, jobId: null, episodes: []
   };
   saveSeriesState(state);
-  runSeriesEpisode(state);
+  runSeriesPlanning(state);
 });
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -677,7 +720,11 @@ window.addEventListener('DOMContentLoaded', () => {
           });
         });
       });
-      runSeriesEpisode(state);
+      if (!state.seriesPlan) {
+        runSeriesPlanning(state);
+      } else {
+        runSeriesEpisode(state);
+      }
     } catch (e) { localStorage.removeItem('activeSeriesJob'); }
   }
 });

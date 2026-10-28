@@ -22,7 +22,7 @@
   .row > div{flex:1;}
   button{margin-top:22px; width:100%; padding:14px; border:none; border-radius:30px; background:linear-gradient(135deg,var(--accent),#4a0d16); color:#faf3e8; font-family:sans-serif; font-weight:600; letter-spacing:.05em; text-transform:uppercase; font-size:.85rem; cursor:pointer;}
   button:disabled{opacity:.5;}
-  #output, #sig-output, #series-output{margin-top:28px; background:var(--panel2); border:1px solid var(--border); border-radius:8px; padding:20px; display:none;}
+  #output, #sig-output{margin-top:28px; background:var(--panel2); border:1px solid var(--border); border-radius:8px; padding:20px; display:none;}
   .card-title{color:var(--accent); font-size:1.05rem; margin:0 0 10px; letter-spacing:.03em;}
   .card-meta{font-family:sans-serif; font-size:.82rem; color:var(--muted); margin-bottom:14px; line-height:1.7;}
   .card-meta b{color:var(--text);}
@@ -31,7 +31,7 @@
   #full-prompt, #sig-full-prompt{white-space:pre-wrap; font-size:.9rem; line-height:1.55; margin-top:12px;}
   .copy-btn, .again-btn{margin-top:14px; width:auto; display:inline-block; padding:10px 18px; border-radius:30px; font-size:.75rem;}
   .again-btn{background:transparent; border:1px solid var(--accent); color:var(--accent);}
-  #status, #series-status{margin-top:16px; font-family:sans-serif; color:var(--muted); font-size:.85rem; display:none;}
+  #status{margin-top:16px; font-family:sans-serif; color:var(--muted); font-size:.85rem; display:none;}
   .hint{font-family:sans-serif; font-size:.72rem; color:var(--muted); margin-top:-2px; margin-bottom:6px;}
   .mode-row{display:flex; gap:8px; margin-bottom:24px; flex-wrap:wrap;}
   .mode-btn{
@@ -41,8 +41,6 @@
     min-width:100px;
   }
   .mode-btn.active{background:var(--accent); color:#faf3e8;}
-  .episode-card{margin-bottom:18px; padding-bottom:18px; border-bottom:1px solid var(--border);}
-  .episode-card:last-child{border-bottom:none; margin-bottom:0; padding-bottom:0;}
   .leave-note{font-family:sans-serif; font-size:.72rem; color:var(--muted); margin-top:10px; text-align:center;}
 </style>
 </head>
@@ -54,7 +52,6 @@
   <div class="mode-row">
     <button type="button" id="mode-generate" class="mode-btn active">Generate New Story</button>
     <button type="button" id="mode-signature" class="mode-btn">Browse Signature Prompts</button>
-    <button type="button" id="mode-series" class="mode-btn">Create a Series</button>
   </div>
 
   <div id="generator-section">
@@ -182,134 +179,6 @@
     <select id="sig-select"></select>
     <div id="sig-output"></div>
   </div>
-
-  <div id="series-section" style="display:none;">
-    <div class="hint" style="margin-bottom:10px;">Create a connected multi-episode mini-series — same characters, same look, across up to 3 episodes with cliffhangers that carry the story forward.</div>
-
-    <label for="series-genre">Genre</label>
-    <select id="series-genre">
-      <option value="drama">Drama</option>
-      <option value="comedy">Comedy</option>
-      <option value="thriller">Thriller</option>
-      <option value="action">Action</option>
-      <option value="horror">Horror</option>
-      <option value="romance">Romance</option>
-      <option value="mystery">Mystery</option>
-      <option value="scifi">Sci-Fi</option>
-      <option value="noir">Noir (black & white)</option>
-      <option value="90s">90s Nostalgia</option>
-      <option value="surprise">Surprise Me</option>
-    </select>
-
-    <div class="row">
-      <div>
-        <label for="series-length">Length per episode</label>
-        <select id="series-length">
-          <option value="15">15 sec</option>
-          <option value="20">20 sec</option>
-          <option value="30" selected>30 sec</option>
-        </select>
-      </div>
-      <div>
-        <label for="series-episodes">Number of episodes</label>
-        <select id="series-episodes">
-          <option value="2">2</option>
-          <option value="3" selected>3</option>
-        </select>
-      </div>
-    </div>
-
-    <label for="series-chars">Characters</label>
-    <select id="series-chars">
-      <option value="1">1</option>
-      <option value="2" selected>2</option>
-      <option value="3">3</option>
-    </select>
-
-    <div id="series-char2-field" style="display:none;">
-      <label for="series-char2">Character 2 (optional — leave blank and Amora invents them)</label>
-      <div class="hint">e.g. her skeptical best friend, early 30s, no-nonsense energy</div>
-      <textarea id="series-char2" placeholder="Describe who this character is"></textarea>
-    </div>
-
-    <div id="series-char3-field" style="display:none;">
-      <label for="series-char3">Character 3 (optional — leave blank and Amora invents them)</label>
-      <div class="hint">e.g. a strict landlord, stern and unimpressed</div>
-      <textarea id="series-char3" placeholder="Describe who this character is"></textarea>
-    </div>
-
-    <label for="series-ending">Final Episode Ending</label>
-    <select id="series-ending">
-      <option value="">Surprise Me</option>
-      <option value="plot twist">Plot Twist</option>
-      <option value="revenge">Revenge</option>
-      <option value="emotional">Emotional</option>
-      <option value="funny">Funny</option>
-    </select>
-    <div class="hint">Only the final episode uses this ending — earlier episodes always end on a cliffhanger.</div>
-
-    <label for="series-world">Visual World / Setting</label>
-    <select id="series-world">
-      <option value="">Let Amora Choose</option>
-      <option value="luxury">Luxury</option>
-      <option value="city">City</option>
-      <option value="suburban">Suburban</option>
-      <option value="corporate">Corporate</option>
-      <option value="nightlife">Nightlife</option>
-      <option value="travel">Travel</option>
-    </select>
-
-    <label>Character Styling</label>
-    <div style="font-family:sans-serif; font-size:.9rem; margin-top:4px;">
-      <label style="display:flex; align-items:center; gap:8px; text-transform:none; letter-spacing:0; font-size:.9rem; margin-bottom:8px;">
-        <input type="radio" name="series-styling-mode" value="auto" checked style="width:auto;"> Let Amora choose, based on the story
-      </label>
-      <label style="display:flex; align-items:center; gap:8px; text-transform:none; letter-spacing:0; font-size:.9rem;">
-        <input type="radio" name="series-styling-mode" value="manual" style="width:auto;"> I want to choose
-      </label>
-    </div>
-
-    <div id="series-styling-manual-fields" style="display:none;">
-      <label for="series-styling">Wardrobe style</label>
-      <select id="series-styling">
-        <option value="oxblood signature">Oxblood Signature (Amora Lune Atelier)</option>
-        <option value="luxury evening">Luxury Evening</option>
-        <option value="casual chic">Casual Chic</option>
-        <option value="glam">Glam</option>
-        <option value="corporate power">Corporate Power</option>
-        <option value="custom">Custom</option>
-      </select>
-      <textarea id="series-styling-custom" placeholder="e.g. red leather trench, gold hardware" style="display:none;margin-top:8px;"></textarea>
-
-      <label for="series-hair">Hair</label>
-      <select id="series-hair">
-        <option value="">Let Amora Choose</option>
-        <option value="90s blowout">90s Salon Blowout</option>
-        <option value="sleek ponytail">Sleek Ponytail</option>
-        <option value="soft waves">Soft Waves</option>
-        <option value="custom">Custom</option>
-      </select>
-      <textarea id="series-hair-custom" placeholder="e.g. slicked back bun" style="display:none;margin-top:8px;"></textarea>
-
-      <label for="series-makeup">Makeup</label>
-      <select id="series-makeup">
-        <option value="">Let Amora Choose</option>
-        <option value="soft glam">Soft Glam</option>
-        <option value="bold red lip">Bold Red Lip</option>
-        <option value="natural dewy">Natural Dewy</option>
-        <option value="custom">Custom</option>
-      </select>
-      <textarea id="series-makeup-custom" placeholder="e.g. smoky eye, nude lip" style="display:none;margin-top:8px;"></textarea>
-    </div>
-
-    <label for="series-topic">Overarching story idea (recommended — helps keep the series connected)</label>
-    <textarea id="series-topic" placeholder="e.g. a woman discovers her new coworker is hiding a secret identity"></textarea>
-
-    <button id="series-go">Create My Series</button>
-    <div id="series-status">Writing episode 1…</div>
-    <div class="leave-note">You can lock your phone or switch apps — come back any time, the series will continue from where it left off.</div>
-    <div id="series-output"></div>
-  </div>
 </div>
 
 <script src="signature-prompts.js"></script>
@@ -364,22 +233,7 @@ function updateCharFields() {
 document.getElementById('chars').addEventListener('change', updateCharFields);
 updateCharFields();
 
-function updateSeriesCharFields() {
-  const chars = parseInt(document.getElementById('series-chars').value, 10);
-  document.getElementById('series-char2-field').style.display = chars >= 2 ? 'block' : 'none';
-  document.getElementById('series-char3-field').style.display = chars >= 3 ? 'block' : 'none';
-}
-document.getElementById('series-chars').addEventListener('change', updateSeriesCharFields);
-updateSeriesCharFields();
-
 ['styling','hair','makeup'].forEach(field => {
-  document.getElementById(field).addEventListener('change', (e) => {
-    const customBox = document.getElementById(field + '-custom');
-    customBox.style.display = e.target.value === 'custom' ? 'block' : 'none';
-  });
-});
-
-['series-styling','series-hair','series-makeup'].forEach(field => {
   document.getElementById(field).addEventListener('change', (e) => {
     const customBox = document.getElementById(field + '-custom');
     customBox.style.display = e.target.value === 'custom' ? 'block' : 'none';
@@ -389,12 +243,6 @@ updateSeriesCharFields();
 document.querySelectorAll('input[name="styling-mode"]').forEach(radio => {
   radio.addEventListener('change', (e) => {
     document.getElementById('styling-manual-fields').style.display = e.target.value === 'manual' ? 'block' : 'none';
-  });
-});
-
-document.querySelectorAll('input[name="series-styling-mode"]').forEach(radio => {
-  radio.addEventListener('change', (e) => {
-    document.getElementById('series-styling-manual-fields').style.display = e.target.value === 'manual' ? 'block' : 'none';
   });
 });
 
@@ -498,181 +346,6 @@ document.getElementById('go').addEventListener('click', async () => {
   }
 });
 
-function addEpisodeCard(data, episodeNum, totalEpisodes, genreLabel, length) {
-  const output = document.getElementById('series-output');
-  output.style.display = 'block';
-  const text = data.text || '';
-  const lines = text.trim().split('\n');
-  const title = (lines[0] || `EPISODE ${episodeNum}`).replace(/^#+\s*/, '').trim();
-  const body = lines.slice(1).join('\n').trim();
-  const card = document.createElement('div');
-  card.className = 'episode-card';
-  card.innerHTML = `
-    <div class="card-title">${title} 🎬</div>
-    <div class="card-meta">
-      <b>Genre:</b> ${genreLabel}<br>
-      <b>Duration:</b> ${length} sec<br>
-      <b>Episode:</b> ${episodeNum} of ${totalEpisodes}
-    </div>
-    <details><summary>View full Seedance prompt</summary><div class="series-full-prompt"></div></details>
-    <button class="copy-btn series-copy-btn" type="button">Copy Seedance Prompt</button>
-  `;
-  output.appendChild(card);
-  card.querySelector('.series-full-prompt').textContent = body;
-  card.querySelector('.series-copy-btn').addEventListener('click', () => {
-    navigator.clipboard.writeText(body).then(() => {
-      card.querySelector('.series-copy-btn').textContent = 'Copied!';
-    });
-  });
-  return { title, body };
-}
-
-function seriesError(err) {
-  const output = document.getElementById('series-output');
-  output.style.display = 'block';
-  const errDiv = document.createElement('div');
-  errDiv.className = 'card-meta';
-  errDiv.textContent = 'Error: ' + err;
-  output.appendChild(errDiv);
-  localStorage.removeItem('activeSeriesJob');
-  document.getElementById('series-status').style.display = 'none';
-  document.getElementById('series-go').disabled = false;
-}
-
-function saveSeriesState(state) {
-  localStorage.setItem('activeSeriesJob', JSON.stringify(state));
-}
-
-async function runSeriesPlanning(state) {
-  const status = document.getElementById('series-status');
-  const btn = document.getElementById('series-go');
-  status.style.display = 'block';
-  status.textContent = 'Planning your series…';
-  btn.disabled = true;
-
-  let planJobId = state.planJobId;
-  if (!planJobId) {
-    try {
-      const startRes = await fetch('/api/start', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          mode: 'series-plan', genre: state.genre, chars: state.chars,
-          char2: state.char2, char3: state.char3, ending: state.ending, world: state.world,
-          topic: state.topic, totalEpisodes: state.totalEpisodes
-        })
-      });
-      const startData = await startRes.json();
-      if (!startRes.ok || !startData.jobId) {
-        seriesError(startData.error || 'Could not start planning');
-        return;
-      }
-      planJobId = startData.jobId;
-      state.planJobId = planJobId;
-      saveSeriesState(state);
-    } catch (err) {
-      seriesError(String(err));
-      return;
-    }
-  }
-
-  pollJob(planJobId, {
-    onDone: (data) => {
-      state.seriesPlan = data.text || '';
-      state.planJobId = null;
-      saveSeriesState(state);
-      runSeriesEpisode(state);
-    },
-    onError: (err) => seriesError(err)
-  });
-}
-
-async function runSeriesEpisode(state) {
-  const status = document.getElementById('series-status');
-  const btn = document.getElementById('series-go');
-  status.style.display = 'block';
-  status.textContent = `Writing episode ${state.currentEpisode} of ${state.totalEpisodes}…`;
-  btn.disabled = true;
-
-  let jobId = state.jobId;
-  if (!jobId) {
-    try {
-      const startRes = await fetch('/api/start', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          mode: 'series', genre: state.genre, length: state.length, chars: state.chars,
-          char2: state.char2, char3: state.char3, ending: state.ending, world: state.world,
-          wardrobe: state.wardrobe, hair: state.hair, makeup: state.makeup, topic: state.topic,
-          episodeNumber: state.currentEpisode, totalEpisodes: state.totalEpisodes,
-          previousEpisodeText: state.previousEpisodeText, seriesPlan: state.seriesPlan
-        })
-      });
-      const startData = await startRes.json();
-      if (!startRes.ok || !startData.jobId) {
-        seriesError(startData.error || 'Could not start generation');
-        return;
-      }
-      jobId = startData.jobId;
-      state.jobId = jobId;
-      saveSeriesState(state);
-    } catch (err) {
-      seriesError(String(err));
-      return;
-    }
-  }
-
-  pollJob(jobId, {
-    onDone: (data) => {
-      const genreLabel = document.getElementById('series-genre').selectedOptions[0]
-        ? document.getElementById('series-genre').selectedOptions[0].text
-        : state.genre;
-      const { title, body } = addEpisodeCard(data, state.currentEpisode, state.totalEpisodes, genreLabel, state.length);
-
-      state.episodes = state.episodes || [];
-      state.episodes.push({ episodeNum: state.currentEpisode, title, body });
-
-      const nextEpisode = state.currentEpisode + 1;
-      if (nextEpisode > state.totalEpisodes) {
-        localStorage.removeItem('activeSeriesJob');
-        status.style.display = 'none';
-        btn.disabled = false;
-      } else {
-        const nextState = { ...state, currentEpisode: nextEpisode, previousEpisodeText: data.text, jobId: null };
-        saveSeriesState(nextState);
-        runSeriesEpisode(nextState);
-      }
-    },
-    onError: (err) => seriesError(err)
-  });
-}
-
-document.getElementById('series-go').addEventListener('click', () => {
-  const genre = document.getElementById('series-genre').value;
-  const length = document.getElementById('series-length').value;
-  const totalEpisodes = parseInt(document.getElementById('series-episodes').value, 10);
-  const chars = document.getElementById('series-chars').value;
-  const char2 = document.getElementById('series-char2').value.trim();
-  const char3 = document.getElementById('series-char3').value.trim();
-  const ending = document.getElementById('series-ending').value;
-  const world = document.getElementById('series-world').value;
-  const topic = document.getElementById('series-topic').value.trim();
-  const manualStyling = document.querySelector('input[name="series-styling-mode"]:checked').value === 'manual';
-  const wardrobe = manualStyling ? fieldValue('series-styling') : '';
-  const hair = manualStyling ? fieldValue('series-hair') : '';
-  const makeup = manualStyling ? fieldValue('series-makeup') : '';
-
-  document.getElementById('series-output').innerHTML = '';
-  document.getElementById('series-output').style.display = 'none';
-
-  const state = {
-    genre, length, totalEpisodes, chars, char2, char3, ending, world, wardrobe, hair, makeup, topic,
-    currentEpisode: 1, previousEpisodeText: '', seriesPlan: '', planJobId: null, jobId: null, episodes: []
-  };
-  saveSeriesState(state);
-  runSeriesPlanning(state);
-});
-
 window.addEventListener('DOMContentLoaded', () => {
   const savedStory = localStorage.getItem('activeStoryJob');
   if (savedStory) {
@@ -697,55 +370,24 @@ window.addEventListener('DOMContentLoaded', () => {
     } catch (e) { localStorage.removeItem('activeStoryJob'); }
   }
 
-  const savedSeries = localStorage.getItem('activeSeriesJob');
-  if (savedSeries) {
-    try {
-      const state = JSON.parse(savedSeries);
-      const output = document.getElementById('series-output');
-      output.style.display = 'block';
-      (state.episodes || []).forEach(ep => {
-        const card = document.createElement('div');
-        card.className = 'episode-card';
-        card.innerHTML = `
-          <div class="card-title">${ep.title} 🎬</div>
-          <div class="card-meta"><b>Episode:</b> ${ep.episodeNum} of ${state.totalEpisodes}</div>
-          <details><summary>View full Seedance prompt</summary><div class="series-full-prompt"></div></details>
-          <button class="copy-btn series-copy-btn" type="button">Copy Seedance Prompt</button>
-        `;
-        output.appendChild(card);
-        card.querySelector('.series-full-prompt').textContent = ep.body;
-        card.querySelector('.series-copy-btn').addEventListener('click', () => {
-          navigator.clipboard.writeText(ep.body).then(() => {
-            card.querySelector('.series-copy-btn').textContent = 'Copied!';
-          });
-        });
-      });
-      if (!state.seriesPlan) {
-        runSeriesPlanning(state);
-      } else {
-        runSeriesEpisode(state);
-      }
-    } catch (e) { localStorage.removeItem('activeSeriesJob'); }
-  }
+  // clean up any leftover series job data from before this feature was removed
+  localStorage.removeItem('activeSeriesJob');
 });
 
 const generateBtn = document.getElementById('mode-generate');
 const signatureBtn = document.getElementById('mode-signature');
-const seriesBtn = document.getElementById('mode-series');
 const generatorSection = document.getElementById('generator-section');
 const signatureSection = document.getElementById('signature-section');
-const seriesSection = document.getElementById('series-section');
 
 function activateMode(active) {
-  [generateBtn, signatureBtn, seriesBtn].forEach(b => b.classList.remove('active'));
-  [generatorSection, signatureSection, seriesSection].forEach(s => s.style.display = 'none');
+  [generateBtn, signatureBtn].forEach(b => b.classList.remove('active'));
+  [generatorSection, signatureSection].forEach(s => s.style.display = 'none');
   active.btn.classList.add('active');
   active.section.style.display = 'block';
 }
 
 generateBtn.addEventListener('click', () => activateMode({ btn: generateBtn, section: generatorSection }));
 signatureBtn.addEventListener('click', () => activateMode({ btn: signatureBtn, section: signatureSection }));
-seriesBtn.addEventListener('click', () => activateMode({ btn: seriesBtn, section: seriesSection }));
 
 const sigSelect = document.getElementById('sig-select');
 const sigOutput = document.getElementById('sig-output');

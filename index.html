@@ -44,6 +44,14 @@
   .episode-card{margin-bottom:18px; padding-bottom:18px; border-bottom:1px solid var(--border);}
   .episode-card:last-child{border-bottom:none; margin-bottom:0; padding-bottom:0;}
   .leave-note{font-family:sans-serif; font-size:.72rem; color:var(--muted); margin-top:10px; text-align:center;}
+  .storymode-row{display:flex; gap:8px; margin-top:6px; flex-wrap:wrap;}
+  .storymode-btn{
+    flex:1; padding:10px 8px; border-radius:30px; border:1px solid var(--accent2);
+    background:transparent; color:var(--accent2); font-family:sans-serif; font-weight:600;
+    font-size:.68rem; text-transform:uppercase; letter-spacing:.03em; cursor:pointer; margin-top:0;
+    min-width:110px;
+  }
+  .storymode-btn.active{background:var(--accent2); color:#faf3e8;}
 </style>
 </head>
 <body>
@@ -58,6 +66,13 @@
   </div>
 
   <div id="generator-section">
+    <label>Story Style</label>
+    <div class="storymode-row">
+      <button type="button" id="storymode-cinematic" class="storymode-btn active" data-value="cinematic">Cinematic Film</button>
+      <button type="button" id="storymode-viral" class="storymode-btn" data-value="viral">Viral Cinematic</button>
+    </div>
+    <div class="hint" id="storymode-hint" style="margin-top:8px;">Immersive storytelling with natural pacing — like a real short film.</div>
+
     <label for="genre">Genre</label>
     <select id="genre">
       <option value="drama">Drama</option>
@@ -185,6 +200,13 @@
 
   <div id="series-section" style="display:none;">
     <div class="hint" style="margin-bottom:10px;">Create a connected multi-episode mini-series — same characters, same look, across up to 3 episodes with cliffhangers that carry the story forward.</div>
+
+    <label>Story Style</label>
+    <div class="storymode-row">
+      <button type="button" id="series-storymode-cinematic" class="storymode-btn active" data-value="cinematic">Cinematic Film</button>
+      <button type="button" id="series-storymode-viral" class="storymode-btn" data-value="viral">Viral Cinematic</button>
+    </div>
+    <div class="hint" id="series-storymode-hint" style="margin-top:8px;">Immersive storytelling with natural pacing — like a real short film.</div>
 
     <label for="series-genre">Genre</label>
     <select id="series-genre">
@@ -393,6 +415,27 @@ function fieldValue(name) {
   return select;
 }
 
+function setupStoryModeToggle(cinematicId, viralId, hintId) {
+  const cinematicBtn = document.getElementById(cinematicId);
+  const viralBtn = document.getElementById(viralId);
+  const hint = document.getElementById(hintId);
+  const hints = {
+    cinematic: 'Immersive storytelling with natural pacing — like a real short film.',
+    viral: 'Fast 0–3 sec hook, tighter pacing, built to stop the scroll on Reels & TikTok — still a real mini-film.'
+  };
+  function select(value) {
+    cinematicBtn.classList.toggle('active', value === 'cinematic');
+    viralBtn.classList.toggle('active', value === 'viral');
+    hint.textContent = hints[value];
+  }
+  cinematicBtn.addEventListener('click', () => select('cinematic'));
+  viralBtn.addEventListener('click', () => select('viral'));
+  return () => (cinematicBtn.classList.contains('active') ? 'cinematic' : 'viral');
+}
+
+const getStoryMode = setupStoryModeToggle('storymode-cinematic', 'storymode-viral', 'storymode-hint');
+const getSeriesStoryMode = setupStoryModeToggle('series-storymode-cinematic', 'series-storymode-viral', 'series-storymode-hint');
+
 function renderStory(data, meta) {
   const output = document.getElementById('output');
   const text = data.text || '';
@@ -431,6 +474,7 @@ function renderStory(data, meta) {
 }
 
 document.getElementById('go').addEventListener('click', async () => {
+  const storyMode = getStoryMode();
   const genre = document.getElementById('genre').value;
   const length = document.getElementById('length').value;
   const chars = document.getElementById('chars').value;
@@ -457,7 +501,7 @@ document.getElementById('go').addEventListener('click', async () => {
     const startRes = await fetch('/api/start', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ mode: 'single', genre, length, chars, char2, char3, ending, world, wardrobe, hair, makeup, topic })
+      body: JSON.stringify({ mode: 'single', storyMode, genre, length, chars, char2, char3, ending, world, wardrobe, hair, makeup, topic })
     });
     const startData = await startRes.json();
     if (!startRes.ok || !startData.jobId) {
@@ -546,7 +590,7 @@ async function runSeriesEpisode(state) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          mode: 'series', genre: state.genre, length: state.length, chars: state.chars,
+          mode: 'series', storyMode: state.storyMode, genre: state.genre, length: state.length, chars: state.chars,
           char2: state.char2, char3: state.char3, ending: state.ending, world: state.world,
           wardrobe: state.wardrobe, hair: state.hair, makeup: state.makeup, topic: state.topic,
           episodeNumber: state.currentEpisode, totalEpisodes: state.totalEpisodes,
@@ -593,6 +637,7 @@ async function runSeriesEpisode(state) {
 }
 
 document.getElementById('series-go').addEventListener('click', () => {
+  const storyMode = getSeriesStoryMode();
   const genre = document.getElementById('series-genre').value;
   const length = document.getElementById('series-length').value;
   const totalEpisodes = parseInt(document.getElementById('series-episodes').value, 10);
@@ -611,7 +656,7 @@ document.getElementById('series-go').addEventListener('click', () => {
   document.getElementById('series-output').style.display = 'none';
 
   const state = {
-    genre, length, totalEpisodes, chars, char2, char3, ending, world, wardrobe, hair, makeup, topic,
+    storyMode, genre, length, totalEpisodes, chars, char2, char3, ending, world, wardrobe, hair, makeup, topic,
     currentEpisode: 1, previousEpisodeText: '', jobId: null, episodes: []
   };
   saveSeriesState(state);

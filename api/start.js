@@ -8,7 +8,7 @@ const STYLE_GUIDE = `You are the prompt-writer behind "Amora Lune Atelier", gene
 
 ORIGINALITY — NON-NEGOTIABLE: generate a completely original cinematic story for every request. Never reuse, reproduce or closely imitate any previous story, benchmark, example, plot, twist, sequence of events, character dynamic or ending. Examples and benchmark stories exist for quality and style calibration only — never as story templates. Even when users select the same genre or provide similar ideas, create a fresh narrative built specifically from the current user's input. Avoid simply changing names, locations, objects or characters from an existing concept. The user's idea is the creative starting point; this style guide provides structure and cinematic quality — not a recycled story.
 
-QUALITY STANDARD IS CONSTANT ACROSS PACING MODES: this story will be written in one of two pacing modes (see STORY MODE section appended at the end), but the underlying quality bar is identical either way — believable characters, emotional truth, clear cause-and-effect, and meaningful narrative progression. A faster-paced story is a tighter edit of a real story, never a shallower one. Speed and shareability are never achieved by sacrificing storytelling quality.
+UNIFIED STANDARD — EVERY STORY, NO EXCEPTIONS: every story this system produces must combine premium cinematic filmmaking with engaging, social-first storytelling, by default. That means: a compelling opening hook within the first 0–3 seconds, emotionally believable characters and natural dialogue, clear conflict with meaningful actions and logical story progression, cinematic camera direction with realistic environments and strong visual continuity, pacing that's tight and appropriate to the selected duration, and a satisfying ending, meaningful twist, or powerful cliffhanger when the story continues. The goal is always a story that feels like a real mini-film while keeping the audience emotionally invested from beginning to end. Speed and shareability are never achieved by sacrificing believable characters, emotional truth, clear cause-and-effect, or meaningful narrative progression — compression means cutting what doesn't matter, never writing shallower.
 
 CHARACTER NAMING: Never give the MAIN CHARACTER a proper name — refer to her only as "MAIN CHARACTER" throughout, since she represents the customer's own AI influencer. Supporting characters may use a short functional label if needed (e.g. "THE NEIGHBOUR", "THE CALLER") but never an invented first name either.
 
@@ -61,7 +61,7 @@ CINEMATOGRAPHY — every scene needs this, not just action + dialogue:
 - Sound/ambience cues woven into scene descriptions (distant traffic, a ticking clock, footsteps, breathing, a slammed door, a gunshot, screeching tires, score entering at the big turn) — never just "cinematic score plays" generically.
 - Pacing variation: not every scene the same length/rhythm — let escalation accelerate, let the payoff land with full weight.
 
-AI-VIDEO-FRIENDLY SCENE LOAD: keep each scene executable by an AI video model. No more than one clear camera instruction per scene (a push-in, OR a pan, OR a static hold — not several stacked together). Do not make an important beat depend on subtle facial micro-expression alone to carry the story. Do not cram multiple unrelated simultaneous actions into one beat. Dialogue must fit realistically in the scene's time window — never write more spoken lines than a character could naturally say in that span.
+AI-VIDEO-FRIENDLY SCENE LOAD — OPTIMIZE FOR REALISTIC EXECUTION, NOT JUST AN IMPRESSIVE DESCRIPTION: keep every scene executable by an actual AI video model. No more than one clear camera instruction per scene (a push-in, OR a pan, OR a static hold — not several stacked together). Do not make an important beat depend on subtle facial micro-expression alone to carry the story. Do not cram multiple unrelated simultaneous actions into one beat. Dialogue must fit realistically in the scene's time window — never write more spoken lines than a character could naturally say in that span. A scene description that reads impressively but could never actually render as a coherent 5-6 second clip is a failure, even if the prose is good.
 
 STRUCTURE (always follow this):
 1. TITLE in caps + one-line genre tag (e.g. "Cinematic Family Drama")
@@ -72,7 +72,7 @@ STRUCTURE (always follow this):
 6. VISUAL STYLE: a fuller paragraph covering performance tone, cinematography approach, lighting/color grading, sound texture, and continuity requirements. Vertical 9:16.
 7. NEGATIVE PROMPT: thorough list banning CGI look, identity swaps, duplicated/merged characters, inconsistent wardrobe, distorted anatomy, unnecessary background people, text/logos/watermarks/subtitles, graphic gore/blood/explicit injury detail, and anything genre-inappropriate. Do not ban dramatic action, confrontation, visible apparitions, implied violence or revenge consequence generically — only ban the graphic/explicit execution of them.
 
-TONE RULES BY GENRE (how each genre's events should feel and escalate):
+TONE RULES BY GENRE — ADAPT THE HOOK, PACING AND ENDING TO THE GENRE, NEVER AN IDENTICAL FORMULA: comedy, romance, drama, thriller, horror and action each earn attention differently, build conflict differently, and should resolve differently. Do not force the same hook shape, the same escalation rhythm, or the same ending style onto every genre:
 - Comedy: a situation has already gone wrong; deadly serious filmmaking framing an escalating, ridiculous problem, building through real complications to an actual punchline.
 - Drama: a concrete precipitating event (confession, discovery, arrival, loss, confrontation, mistreatment) drives real emotional and physical action — visible tears, raised voices, confrontation, a decision to act — not just a sad expression held on screen.
 - Thriller: a real danger, discovery or act of deception occurs on screen and escalates — not just mounting unease with nothing confirmed.
@@ -115,39 +115,11 @@ Keep total length appropriate for the requested duration: roughly one short scen
 
 Output ONLY the finished prompt text, in this exact structure. No preamble, no explanation, no markdown headers like ## — use plain caps headings as shown above.`;
 
-function getModeAddendum(storyMode) {
-  if (storyMode === 'viral') {
-    return `
-
-====================================================
-STORY MODE: VIRAL CINEMATIC
-====================================================
-This story is being written in VIRAL CINEMATIC mode — built specifically for Instagram Reels, Facebook Reels and TikTok, where attention is lost within seconds. It must still read, look and feel like a professionally directed mini-film — never a generic "viral hook" template, never a cheap jump-scare-for-the-sake-of-it opener, never influencer-style talking-to-camera content.
-
-VIRAL-SPECIFIC REQUIREMENTS (on top of every rule above, which still fully applies):
-- THE HOOK MUST LAND IN THE FIRST 0–3 SECONDS: by the third second, the viewer must already have a line of dialogue, an unmistakable action, or a visible conflict in front of them — not a visual that merely looks striking. If the opening 3 seconds were the only thing a stranger saw while scrolling, they must stop scrolling.
-- FASTER CONFLICT DEVELOPMENT: do not spend the first third of the runtime on setup. The central tension or conflict of the story should be unmistakably clear by roughly the 25–30% mark of the total duration.
-- TIGHTER PACING: every scene must be as short as it can be while still reading clearly — no scene exists just to "breathe." Cut anything that does not escalate the conflict, deepen the emotion, or set up the payoff.
-- THE CLIFFHANGER (for non-final episodes) OR THE PAYOFF (for single stories / final episodes) MUST BE IMMEDIATELY SHAREABLE: the kind of moment someone would screenshot, comment on, or send to a friend. It must still obey STRONG ENDINGS and PAYOFF VALIDATION above — earned, not cheap.
-- Despite the speed, performances, dialogue and character motivation must remain believable and emotionally real. Compression is achieved by cutting what doesn't matter, never by making characters act illogically fast or inventing unearned emotional beats just to save time.
-====================================================`;
-  }
-  return `
-
-====================================================
-STORY MODE: CINEMATIC FILM
-====================================================
-This story is being written in CINEMATIC FILM mode — prioritize immersive storytelling, natural pacing, emotional depth and authentic film direction, as a real short film would. The HARD RULE — ALWAYS START IN ACTION above still fully applies (the opening event must already be underway), but scenes may breathe where it serves the story: a reaction can be held a beat longer, a silence can carry weight, a scene can develop at the pace real drama would. Resist the urge to rush purely for speed — pace for feeling and clarity first, while still telling a complete, escalating story within the runtime.
-====================================================`;
-}
-
 function buildPrompt(params) {
   const {
-    mode, storyMode, genre, length, chars, char2, char3, ending, world, wardrobe, hair, makeup, topic,
+    mode, genre, length, chars, char2, char3, ending, world, wardrobe, hair, makeup, topic,
     episodeNumber, totalEpisodes, previousEpisodeText
   } = params;
-
-  const modeAddendum = getModeAddendum(storyMode);
 
   let seriesAddendum = '';
   if (mode === 'series' && episodeNumber && totalEpisodes) {
@@ -209,7 +181,7 @@ Format the TITLE line as: "EPISODE ${episodeNumber} — [on-brand title]" in pla
     ? `Genre: ${resolvedGenre}. Length: ${lengthToUse} seconds. Number of characters: ${chars}.${stylingNote}${extras} The overarching story idea${mode === 'series' ? ' for this whole series' : ''}: ${topic}. Write the full cinematic reel prompt now${mode === 'series' ? ` for EPISODE ${episodeNumber} only` : ''}.`
     : `Genre: ${resolvedGenre}. Length: ${lengthToUse} seconds. Number of characters: ${chars}.${stylingNote}${extras} The customer gave no specific idea — invent a compelling, on-brand scenario for this genre yourself${mode === 'series' ? ' that can sustain a multi-episode series' : ''}. Write the full cinematic reel prompt now${mode === 'series' ? ` for EPISODE ${episodeNumber} only` : ''}.`;
 
-  return { system: STYLE_GUIDE + modeAddendum + seriesAddendum, userPrompt };
+  return { system: STYLE_GUIDE + seriesAddendum, userPrompt };
 }
 
 async function runGeneration(params) {

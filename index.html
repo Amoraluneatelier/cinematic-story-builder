@@ -318,11 +318,16 @@ const POLL_INTERVAL = 3000;
 
 function pollJob(jobId, { onDone, onError, onTick }) {
   let stopped = false;
+  let inFlight = false;
+  let timer = null;
   async function check() {
-    if (stopped) return;
+    if (stopped || inFlight) return;
+    inFlight = true;
+    if (timer) { clearTimeout(timer); timer = null; }
     try {
       const res = await fetch(`/api/status?jobId=${jobId}`);
       const data = await res.json();
+      if (stopped) return;
       if (data.status === 'done') {
         stopped = true;
         onDone(data);
@@ -331,10 +336,12 @@ function pollJob(jobId, { onDone, onError, onTick }) {
         onError(data.error || 'Unknown error');
       } else {
         if (onTick) onTick(data);
-        if (!stopped) setTimeout(check, POLL_INTERVAL);
+        if (!stopped) timer = setTimeout(check, POLL_INTERVAL);
       }
     } catch (err) {
-      if (!stopped) setTimeout(check, POLL_INTERVAL);
+      if (!stopped) timer = setTimeout(check, POLL_INTERVAL);
+    } finally {
+      inFlight = false;
     }
   }
   check();
@@ -342,7 +349,11 @@ function pollJob(jobId, { onDone, onError, onTick }) {
     if (!stopped && document.visibilityState === 'visible') check();
   };
   document.addEventListener('visibilitychange', visHandler);
-  return () => { stopped = true; document.removeEventListener('visibilitychange', visHandler); };
+  return () => {
+    stopped = true;
+    document.removeEventListener('visibilitychange', visHandler);
+    if (timer) clearTimeout(timer);
+  };
 }
 
 function updateCharFields() {
@@ -550,7 +561,7 @@ async function runSeriesEpisode(state) {
           char2: state.char2, char3: state.char3, ending: state.ending, world: state.world,
           wardrobe: state.wardrobe, hair: state.hair, makeup: state.makeup, topic: state.topic,
           episodeNumber: state.currentEpisode, totalEpisodes: state.totalEpisodes,
-          previousEpisodeText: state.previousEpisodeText
+          previousEpisodeText: state.previousEpisodeText, seriesPlan: state.seriesPlan
         })
       });
       const startData = await startRes.json();
@@ -576,6 +587,7 @@ async function runSeriesEpisode(state) {
 
       state.episodes = state.episodes || [];
       state.episodes.push({ episodeNum: state.currentEpisode, title, body });
+      state.seriesPlan = data.seriesPlan || state.seriesPlan;
 
       const nextEpisode = state.currentEpisode + 1;
       if (nextEpisode > state.totalEpisodes) {
@@ -612,7 +624,7 @@ document.getElementById('series-go').addEventListener('click', () => {
 
   const state = {
     genre, length, totalEpisodes, chars, char2, char3, ending, world, wardrobe, hair, makeup, topic,
-    currentEpisode: 1, previousEpisodeText: '', jobId: null, episodes: []
+    currentEpisode: 1, previousEpisodeText: '', seriesPlan: '', jobId: null, episodes: []
   };
   saveSeriesState(state);
   runSeriesEpisode(state);

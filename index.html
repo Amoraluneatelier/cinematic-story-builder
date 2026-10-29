@@ -42,10 +42,25 @@
   }
   .mode-btn.active{background:var(--accent); color:#faf3e8;}
   .leave-note{font-family:sans-serif; font-size:.72rem; color:var(--muted); margin-top:10px; text-align:center;}
+  #gate-overlay{position:fixed; inset:0; background:var(--bg); z-index:100; display:flex; align-items:center; justify-content:center; padding:24px;}
+  #gate-box{max-width:360px; width:100%; text-align:center;}
+  #gate-box h1{margin-bottom:6px;}
+  #gate-box .sub{margin-bottom:20px;}
+  #gate-error{font-family:sans-serif; font-size:.82rem; color:var(--accent); margin-top:10px; display:none;}
+  #main-wrap{display:none;}
 </style>
 </head>
 <body>
-<div class="wrap">
+<div id="gate-overlay" style="display:none;">
+  <div id="gate-box">
+    <h1>Cinematic Studio</h1>
+    <div class="sub">Voer je toegangscode in om verder te gaan.</div>
+    <input type="text" id="gate-code" placeholder="Toegangscode" autocomplete="off">
+    <button id="gate-submit" type="button">Ontgrendelen</button>
+    <div id="gate-error">Onjuiste toegangscode — probeer het opnieuw.</div>
+  </div>
+</div>
+<div class="wrap" id="main-wrap">
   <h1>Cinematic Studio</h1>
   <div class="sub">Turn your ideas into cinematic AI video stories.</div>
 
@@ -183,6 +198,68 @@
 
 <script src="signature-prompts.js"></script>
 <script>
+function getAccessCode() {
+  try { return localStorage.getItem('accessCode') || ''; } catch (e) { return ''; }
+}
+function setAccessCode(code) {
+  try { localStorage.setItem('accessCode', code); } catch (e) {}
+}
+function clearAccessCode() {
+  try { localStorage.removeItem('accessCode'); } catch (e) {}
+}
+
+async function tryUnlock(code, { onFail } = {}) {
+  try {
+    const res = await fetch('/api/start', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode: 'verify-code', accessCode: code })
+    });
+    if (res.status === 401) { if (onFail) onFail(); return false; }
+    if (!res.ok) { if (onFail) onFail(); return false; }
+    setAccessCode(code);
+    document.getElementById('gate-overlay').style.display = 'none';
+    document.getElementById('main-wrap').style.display = 'block';
+    return true;
+  } catch (e) {
+    if (onFail) onFail();
+    return false;
+  }
+}
+
+function showGate() {
+  clearAccessCode();
+  document.getElementById('main-wrap').style.display = 'none';
+  document.getElementById('gate-overlay').style.display = 'flex';
+}
+
+(function initGate() {
+  const savedCode = getAccessCode();
+  if (savedCode) {
+    // Optimistic: trust the saved code immediately so the page doesn't flash a lock screen on every visit.
+    // It is still re-verified for real on the next actual /api/start call (see handleAccessDenied below).
+    document.getElementById('main-wrap').style.display = 'block';
+    document.getElementById('gate-overlay').style.display = 'none';
+  } else {
+    showGate();
+  }
+  document.getElementById('gate-submit').addEventListener('click', async () => {
+    const code = document.getElementById('gate-code').value.trim();
+    const errEl = document.getElementById('gate-error');
+    errEl.style.display = 'none';
+    if (!code) return;
+    const ok = await tryUnlock(code, { onFail: () => { errEl.style.display = 'block'; } });
+  });
+  document.getElementById('gate-code').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') document.getElementById('gate-submit').click();
+  });
+})();
+
+function handleAccessDenied() {
+  showGate();
+  document.getElementById('gate-error').style.display = 'block';
+}
+
 const POLL_INTERVAL = 3000;
 
 function pollJob(jobId, { onDone, onError, onTick }) {
@@ -316,8 +393,14 @@ document.getElementById('go').addEventListener('click', async () => {
     const startRes = await fetch('/api/start', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ mode: 'single', genre, length, chars, char2, char3, ending, world, wardrobe, hair, makeup, topic })
+      body: JSON.stringify({ mode: 'single', genre, length, chars, char2, char3, ending, world, wardrobe, hair, makeup, topic, accessCode: getAccessCode() })
     });
+    if (startRes.status === 401) {
+      btn.disabled = false;
+      status.style.display = 'none';
+      handleAccessDenied();
+      return;
+    }
     const startData = await startRes.json();
     if (!startRes.ok || !startData.jobId) {
       throw new Error(startData.error || 'Could not start generation');

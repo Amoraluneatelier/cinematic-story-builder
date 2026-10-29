@@ -42,6 +42,8 @@
   }
   .mode-btn.active{background:var(--accent); color:#faf3e8;}
   .leave-note{font-family:sans-serif; font-size:.72rem; color:var(--muted); margin-top:10px; text-align:center;}
+  .make-it-yours{margin:16px 0 4px; padding:12px 14px; border-left:2px solid var(--accent); font-family:sans-serif; font-size:.8rem; line-height:1.6; color:var(--muted);}
+  .make-it-yours b{display:block; color:var(--accent); font-family:Georgia,serif; font-size:.9rem; letter-spacing:.03em; margin-bottom:4px;}
   #gate-overlay{position:fixed; inset:0; background:var(--bg); z-index:100; display:flex; align-items:center; justify-content:center; padding:24px;}
   #gate-box{max-width:360px; width:100%; text-align:center;}
   #gate-box h1{margin-bottom:6px;}
@@ -350,6 +352,7 @@ function renderStory(data, meta) {
       <b>Characters:</b> ${meta.chars}
     </div>
     <details><summary>View full Seedance prompt</summary><div id="full-prompt"></div></details>
+    <div class="make-it-yours"><b>Make It Yours</b>Read through your story before bringing it to life. Not quite the vibe you imagined? Generate again to explore a fresh creative direction.</div>
     <button class="copy-btn" id="copy-btn" type="button">Copy Seedance Prompt</button>
     <button class="again-btn" id="again-btn" type="button">Create Another Story</button>
   `;

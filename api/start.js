@@ -381,6 +381,21 @@ export default async function handler(req, res) {
   }
 
   const params = req.body || {};
+
+  // ACCESS GATE: if an ACCESS_CODE is configured in Vercel's environment variables, every request
+  // (including the lightweight 'verify-code' check used by the front-end's unlock screen) must supply
+  // the matching code. If ACCESS_CODE is not set at all, the gate is simply off (no breaking change
+  // until the site owner configures it in Vercel → Settings → Environment Variables).
+  const requiredCode = process.env.ACCESS_CODE;
+  if (requiredCode) {
+    if (params.accessCode !== requiredCode) {
+      return res.status(401).json({ error: 'Invalid access code' });
+    }
+  }
+  if (params.mode === 'verify-code') {
+    return res.status(200).json({ ok: true });
+  }
+
   const jobId = crypto.randomUUID();
   console.log('[handler]', jobId, 'new job, mode=', params.mode);
 
@@ -415,3 +430,4 @@ export default async function handler(req, res) {
   console.log('[handler]', jobId, 'returning jobId to client now');
   return res.status(200).json({ jobId });
 }
+

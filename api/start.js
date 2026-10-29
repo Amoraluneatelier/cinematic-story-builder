@@ -14,6 +14,8 @@ CHARACTER NAMING: Never give the MAIN CHARACTER a proper name — refer to her o
 
 CUSTOMER-SPECIFIED SUPPORTING CHARACTERS: if the customer provided a description for a second or third character, use those exact details as that character's identity, personality, role and relationship to the main character — do not override or replace them. If no description was given for a character slot that exists, invent one that fits the story.
 
+STRICT CHARACTER COUNT — NON-NEGOTIABLE: the customer's selected character count is the EXACT number of independently acting or speaking characters allowed to appear anywhere in the story, with no exceptions. Count every one of the following as a character: anyone with spoken dialogue, an off-screen or phone/recording/intercom voice, anyone who physically intervenes in the action (a guard, pursuer, driver, employee, bystander who steps in), and anyone the plot requires the audience to track as a distinct individual. Background atmosphere (an unnamed crowd, blurred passersby, generic extras who never speak or act) does NOT count, as long as none of them individually acts or speaks. A supernatural double, reflection or recording of the MAIN CHARACTER herself does not count as a second character only if it is clearly the same identity and is written consistently as such throughout — never written as if it were an independent third party. When only one character is selected, the entire story — including its confrontation, dialogue and payoff — must be achievable with that one character alone (give her something to interact with: a phone, a voice, a recording, an object, herself) rather than quietly introducing a second person. Before finalizing, count every acting/speaking entity in the draft and verify it exactly matches the selected character count; if it does not, cut or merge a character rather than exceed the count.
+
 SUPPORTING-CHARACTER CONSISTENCY ACROSS GENERATIONS: a supporting character without an uploaded reference image must still be written with a fixed, specific, reusable visual description the moment they're introduced — build, wardrobe anchor, and one or two distinguishing physical features, concrete enough that the same character could be described identically in a later, separate generation (e.g. a follow-up episode, or the same character brought back in a new story). Never leave a non-referenced recurring character vague enough that their appearance could plausibly drift between generations. This never increases the number of required reference images — supporting characters are described, not referenced, unless the customer explicitly provides a reference for them.
 
 ====================================================
@@ -49,6 +51,8 @@ STRONG ENDINGS: never use "CUT TO BLACK" as a substitute for a payoff — someth
 STORY DENSITY: do not make a story feel empty just because it's short — it should feel COMPRESSED, not empty. Allow enough connected action, dialogue, reaction and movement to tell a complete mini-story. AI-video executability still matters, but technical cleanliness must never be purchased at the cost of entertainment.
 
 SCENE ECONOMY — MATCH COMPLEXITY TO DURATION: a story must be fully achievable within its stated runtime — never write more plot than the duration can actually hold. Every single scene must contribute directly to the narrative: advancing the plot, deepening a character's motivation, or building toward the payoff. Cut anything that doesn't — no scene exists purely to look beautiful, to pad runtime, or to add an extra camera transition for its own sake. Reaction shots and establishing beats are a tool, used sparingly and only where they earn their place — not a default rhythm repeated scene after scene.
+
+STRICT DURATION COMPLIANCE — NON-NEGOTIABLE: the final scene's timestamp must end EXACTLY at the customer's selected duration — never one second over, and never meaningfully under (within about 2 seconds short is acceptable; more than that is not). A shorter selected duration requires a SIMPLER concept with FEWER beats, never the same amount of plot compressed into faster-sounding timestamps. Before writing timestamps, decide how many scenes the duration can actually hold (roughly one scene per 5-6 seconds) and do not exceed that count. For EVERY scene, before finalizing, actually act it out mentally second-by-second and confirm everything listed — dialogue spoken at a natural pace, physical movement, reaction beats, prop handling, camera settling — genuinely fits inside that scene's stated time window. A scene is not feasible merely because its timestamp label adds up correctly on paper; if a scene could not realistically be performed and filmed in its stated seconds, cut content from it until it can.
 
 CREATIVE PRIORITY ORDER (use when any of these pull against each other): 1. Strong story, 2. Entertainment/emotional impact, 3. Active hook, 4. Escalation, 5. Strong payoff, 6. Customer intent, 7. Genre authenticity, 8. AI-video executability, 9. Continuity and technical polish. The continuity, identity, reference-image, readable-text, prop, premise and customer-input rules elsewhere in this guide remain fully active as quality-control — they must shape execution, never make a story boring.
 
@@ -101,6 +105,7 @@ One fuller paragraph covering overall performance tone, cinematography approach,
 
 NEGATIVE PROMPT
 A thorough list banning CGI look, identity swaps, duplicated/merged characters, inconsistent wardrobe, distorted anatomy, unnecessary background people, text/logos/watermarks/subtitles, graphic gore/blood/explicit injury detail, direct eye contact with the camera, and anything genre-inappropriate. Do not ban dramatic action, confrontation, visible apparitions, implied violence or revenge consequence generically — only ban the graphic/explicit execution of them.
+CONTRADICTION CHECK — NON-NEGOTIABLE: before finalizing, re-read the SCENE-BY-SCENE STORY you just wrote and check this NEGATIVE PROMPT against it line by line. If any scene's plot, clue, payoff or dialogue actually depends on a specific document, sign, screen, label or other readable text being visible and understood, the negative prompt must NOT ban readable/legible text — doing so would contradict the story you just wrote. The preferred fix is to avoid writing a scene that depends on readable text in the first place (per the readable-text rule above); only if the story genuinely cannot work without it should the negative prompt allow it. Apply the same check to every other banned item: never ban something the scenes themselves require to tell the story.
 
 TONE RULES BY GENRE — ADAPT THE HOOK, PACING AND ENDING TO THE GENRE, NEVER AN IDENTICAL FORMULA: comedy, romance, drama, thriller, horror and action each earn attention differently, build conflict differently, and should resolve differently. Do not force the same hook shape, the same escalation rhythm, or the same ending style onto every genre:
 - Comedy: a situation has already gone wrong; deadly serious filmmaking framing an escalating, ridiculous problem, building through real complications to an actual punchline.
@@ -112,6 +117,17 @@ TONE RULES BY GENRE — ADAPT THE HOOK, PACING AND ENDING TO THE GENRE, NEVER AN
 - Noir: visually shot in high-contrast black and white — add a line in CINEMATIC DIRECTION: "Black and white, high-contrast noir lighting, venetian-blind shadows" explicitly; clipped, wry dialogue; a real exchange, deception or confrontation drives the plot.
 - 90s Nostalgia: the entire film must look and feel as if it were genuinely shot on 35mm motion-picture film in 1994, in the visual character of a 1990s Hollywood romantic drama or psychological thriller. Strictly 1994 environment, wardrobe, hairstyles, makeup, vehicles, street details, architecture, and payphone design — no modern smartphones, contemporary fashion styling, digital interfaces, LED lighting aesthetics, or modern-looking vehicles. The CINEMATIC DIRECTION section for this genre must include, in full, the following authentic-35mm description (adapt only as needed to fit the specific story, never shorten or drop a part of it): "Authentic 35mm photochemical film texture with fine but clearly visible organic grain, subtle halation around practical lights, gentle highlight blooming, slightly softened image edges, natural film softness, mild optical diffusion, and delicate imperfections characteristic of analog film photography — naturally cinematic and slightly dreamy, never blurry or low-resolution. Warm, nostalgic 1990s film color science with creamy highlights, softly muted colors, natural warm skin tones, subtle amber and honey undertones, gently faded blacks, and restrained contrast; realistic skin texture and dimensionality; no orange-and-teal blockbuster grading, aggressive HDR, modern teal shadows, or exaggerated saturation. Natural late-afternoon and early-evening lighting, soft ambient daylight, gentle shadows, subtle golden reflections on skin, and practical street lighting; faces have the soft, flattering dimensionality of classic 1990s cinema rather than the hyper-detailed, artificially perfect look of modern AI imagery. Photographed with period-authentic 1990s 35mm cinema cameras and vintage spherical lenses: natural cinematic close-ups, medium shots, restrained handheld movement, gentle optical softness, realistic depth of field, subtle focus breathing, occasional naturally imperfect framing — operated like a human cinematographer, not a digitally stabilized AI camera. Naturalistic 1990s film acting with believable facial expressions, emotionally grounded dialogue, and subtle but meaningful character reactions; suspense comes from the conversation, the unfolding threat and the character's changing emotional state, never from exaggerated camera effects. The result must resemble an authentic frame from a professionally produced 1990s feature film, not a modern video with a retro filter applied afterward." In NEGATIVE PROMPT for this genre, also add: VHS tracking lines, camcorder timestamps, tape glitches, heavy scratches, excessive dust, artificial film borders, fake light leaks, extreme blur, excessive grain, modern 4K digital sharpness, oversharpened facial features, plastic skin, beauty-filter effects, modern commercial color grading, CGI appearance, and artificial AI smoothness.
 - Romance/Mystery/Revenge: apply the same standard as above — an event brings people together, pulls them apart, reveals something, or delivers a real consequence; the genre's mood is achieved through how the event is shot, never by having less happen.
+
+ENDING-SPECIFIC QUALITY RULES — RESPECT THE CUSTOMER'S SELECTED ENDING TYPE EXACTLY:
+- Plot Twist: must be surprising but logically supported by clues already planted earlier in the story. Must be understandable from the scenes alone, without needing the STORY OVERVIEW to explain it. Must genuinely change the audience's understanding of what happened. Never rest on an unexplained organization, a secret protocol, or an identity reveal the audience had no way to anticipate.
+- Funny: must land on a clear, understandable punchline or visual comedic payoff that actually makes sense in context — never a random quirky-sounding line thrown in because it "sounds funny." Dialogue must make real conversational sense. Humor must arise from character behavior and the specific situation, not from a non-sequitur.
+- Emotional: the emotion must be earned through a meaningful relationship, discovery, choice, loss, reconciliation or realization established earlier in the story — never manufactured from tears, a long pause, sentimental music or a hug alone with nothing behind it. A quiet, wordless ending is allowed only when everything preceding it has actually built that moment's significance.
+- Revenge: the protagonist must take one clear, understandable action that meaningfully and visibly reverses the situation. The revenge must be proportionate to what was established and genuinely achievable within the selected duration — never bigger or more elaborate than the runtime can actually deliver.
+- Cliffhanger: must end on a clear, consequential turning point. The audience must understand exactly what is now at stake, even while the outcome stays unknown — never end on vague atmosphere or unexplained mystery with nothing concrete having happened.
+- Surprise Me (as an ending selection): choose whichever ending type genuinely fits the story that was just built — do not default to a plot twist out of habit.
+Never force an elaborate plot twist onto a story that would land better with a simple, satisfying ending — match the ending's complexity to what the story actually earned.
+
+STORY VARIETY — NON-NEGOTIABLE: avoid falling into the same handful of narrative patterns across different generations (e.g. defaulting every quiet emotional story to a mother/daughter kitchen scene built around a sentimental object). Draw on a genuinely wide range of relationships (partners, siblings, coworkers, friends, strangers, neighbors, rivals), locations, conflicts, motivations and emotional dynamics appropriate to the genre and the customer's idea. The selected genre should meaningfully shape the plot and stakes themselves, not just the visual treatment layered on top of a recycled story shape. Do not force a stereotypical prop (an old photograph, a family heirloom, a handwritten letter) into a story just because it is a familiar shortcut — only use one when it genuinely serves this specific story.
 
 Do not make an important story beat, reveal, joke or twist depend on AI-generated readable text inside the video (signs, documents, screens, labels). Whenever possible, communicate essential information visually, through dialogue, props or character reactions instead — video generators cannot reliably render legible text.
 
@@ -128,6 +144,10 @@ STORY LOGIC & AI VIDEO FEASIBILITY CHECK — MANDATORY FINAL GATE, NOT OPTIONAL:
 6. AI VIDEO FEASIBILITY — THE DECIDING FACTOR: for every single scene, ask "could a real AI video generator actually render this as one coherent 5-6 second clip?" Reject and rewrite any scene that depends on: more than one camera instruction stacked together; multiple unrelated simultaneous actions; split-second precision timing between two things happening; more dialogue than a character could naturally say in the scene's time window; an important beat resting on subtle micro-expression alone; or a complex phone/screen interaction. A visually or emotionally impressive scene that a generator would likely render as broken, garbled or incoherent is a failure, no matter how good the prose is — simplify the staging without losing the story beat.
 7. READABLE TEXT DEPENDENCY: never make an essential clue, reveal, joke, twist or payoff depend on AI-generated readable text.
 8. GENRE LOGIC: story mechanics must fit the selected genre's internal logic, not only its visual aesthetic.
+9. DURATION: count the final scene's end timestamp — it must exactly equal the customer's selected duration (see STRICT DURATION COMPLIANCE above). Fix immediately if not.
+10. CHARACTER COUNT: count every acting/speaking entity in the draft (see STRICT CHARACTER COUNT above) — it must exactly equal the customer's selected character count. Fix immediately if not.
+11. ENDING TYPE: confirm the ending actually satisfies the specific rules for the customer's selected ending type (see ENDING-SPECIFIC QUALITY RULES above), not just a generic satisfying wrap-up.
+12. NEGATIVE PROMPT CONSISTENCY: confirm the negative prompt does not contradict anything the scenes actually require (see CONTRADICTION CHECK above).
 This check is run last, against the finished draft, as a hard gate — a story that fails any point above gets rewritten before it is ever returned.
 
 CLUE LOGIC CHECK (mystery genre): every important clue must have a clear logical relationship to the mystery — a detail cannot become evidence simply because it looks unusual, ominous or suspicious. If the payoff exposes a lie or contradiction, both pieces of information necessary to understand that contradiction must be established for the audience beforehand. Let the audience recognize the contradiction at approximately the same moment as the protagonist does.
@@ -291,6 +311,39 @@ Format the TITLE line as: "EPISODE ${episodeNumber} — [on-brand title]" in pla
   return { system: STYLE_GUIDE + seriesAddendum, userPrompt };
 }
 
+// Lightweight deterministic validation for measurable constraints only (duration, character count).
+// This cannot and does not judge subjective story quality — that is the STYLE_GUIDE's job.
+function validateStory(text, params) {
+  const issues = [];
+  const requestedLength = Number(params.length || 30);
+  const requestedChars = Number(params.chars || 1);
+
+  // --- Duration check: find every "N–M SEC" style scene timestamp, take the largest end value. ---
+  const timestampMatches = [...text.matchAll(/(\d{1,3})\s*[-–—]\s*(\d{1,3})\s*SEC/gi)];
+  if (timestampMatches.length > 0) {
+    const maxEnd = Math.max(...timestampMatches.map(m => Number(m[2])));
+    if (maxEnd > requestedLength) {
+      issues.push(`The story's timestamps run to ${maxEnd} seconds, but the customer selected ${requestedLength} seconds. The final scene must end at exactly ${requestedLength} seconds, never later.`);
+    } else if (maxEnd < requestedLength - 3) {
+      issues.push(`The story's timestamps only run to ${maxEnd} seconds, well short of the customer's selected ${requestedLength} seconds. Expand it to use the full ${requestedLength} seconds without padding.`);
+    }
+  }
+
+  // --- Character count check: count CHARACTER DETAILS blocks (one WARDROBE line per character) ---
+  // and distinct named speakers in DIALOGUE lines; take the higher estimate since either signal alone can undercount.
+  const wardrobeCount = (text.match(/^WARDROBE:/gm) || []).length;
+  const dialogueSpeakers = new Set();
+  for (const m of text.matchAll(/DIALOGUE:\s*([A-Z][A-Z0-9 \-']{1,40}?)(?:\s*\([^)]*\))?\s*:/g)) {
+    dialogueSpeakers.add(m[1].trim());
+  }
+  const estimatedChars = Math.max(wardrobeCount, dialogueSpeakers.size);
+  if (estimatedChars > requestedChars) {
+    issues.push(`The story appears to include around ${estimatedChars} distinct acting/speaking characters (counting character blocks and dialogue speakers), but the customer selected only ${requestedChars}. Cut or merge characters until exactly ${requestedChars} independently acting/speaking character(s) remain — remember off-screen voices, guards, and anyone who intervenes all count as characters.`);
+  }
+
+  return { ok: issues.length === 0, issues };
+}
+
 async function runGeneration(params) {
   console.log('[runGeneration] mode=', params.mode, 'episodeNumber=', params.episodeNumber);
   if (params.mode === 'series-plan') {
@@ -298,7 +351,23 @@ async function runGeneration(params) {
     return { text: planText, seriesPlan: planText };
   }
   const { system, userPrompt } = buildPrompt(params);
-  const text = await callAnthropic(system, userPrompt, 2000, params.mode || 'single');
+  let text = await callAnthropic(system, userPrompt, 2000, params.mode || 'single');
+
+  // One bounded, deterministic-constraint-triggered retry — never a loop, never for subjective quality.
+  const validation = validateStory(text, params);
+  if (!validation.ok) {
+    console.warn('[runGeneration] validation failed, retrying once:', validation.issues);
+    const correctiveUserPrompt = `${userPrompt}\n\nIMPORTANT — your previous attempt failed these checks, fix them in this rewrite while keeping everything else about the story's quality:\n${validation.issues.map(i => `- ${i}`).join('\n')}`;
+    const retryText = await callAnthropic(system, correctiveUserPrompt, 2000, (params.mode || 'single') + '-retry');
+    const retryValidation = validateStory(retryText, params);
+    if (retryValidation.ok) {
+      text = retryText;
+    } else {
+      console.warn('[runGeneration] retry still failed validation, returning it anyway:', retryValidation.issues);
+      text = retryText; // the corrected attempt is still the best available version
+    }
+  }
+
   return { text, seriesPlan: params.seriesPlan || '' };
 }
 

@@ -77,6 +77,12 @@ CINEMATOGRAPHY — every scene needs this, not just action + dialogue:
 
 AI-VIDEO-FRIENDLY SCENE LOAD — OPTIMIZE FOR REALISTIC EXECUTION, NOT JUST AN IMPRESSIVE DESCRIPTION: keep every scene executable by an actual AI video model. No more than one clear camera instruction per scene (a push-in, OR a pan, OR a static hold — not several stacked together). Do not make an important beat depend on subtle facial micro-expression alone to carry the story. Do not cram multiple unrelated simultaneous actions into one beat. Dialogue must fit realistically in the scene's time window — never write more spoken lines than a character could naturally say in that span. Avoid complex phone-screen interactions (typing, scrolling, reading on-screen text) as a load-bearing story beat — AI video cannot reliably render legible screens or precise phone handling; if a phone matters to the story, keep the physical interaction simple (pick it up, glance at it, drop it, grip it) and carry the actual information through dialogue or the character's reaction instead of the screen content. A scene description that reads impressively but could never actually render as a coherent 5-6 second clip is a failure, even if the prose is good.
 
+ORIGINAL STORY QUALITY — STORIES WITHOUT A CUSTOMER IDEA: every story needs a clear premise that the events make understandable, a main character whose motivation drives their choices, cause and effect from one scene to the next, and a clear beginning, development and payoff. Do not let generic atmosphere (rain, lamps, slow looks, empty rooms) replace actual storytelling; every scene must advance the premise.
+
+OVERLOADED INPUT FITS THE DURATION: when the customer's idea or character descriptions contain more events than the selected duration can hold, keep the essential story beats and the important dialogue, combine or cut secondary actions, let dialogue and natural physical actions overlap, and add no extra scenes. Never lengthen the story beyond the selected duration to fit more content.
+
+SILENCE AND PUNCHLINES: silence must serve a specific emotional, dramatic or comedic purpose. Drama relies on dialogue and meaningful choices, not on long close-ups of a face. Comedy gives the final punchline and its reaction enough time to land (at least about 2 seconds) before the scene ends.
+
 STRUCTURE — ALWAYS FOLLOW THIS EXACT STRUCTURE FOR READABILITY. Use these exact plain-caps section headings, in this order, each separated by a blank line. Never repeat the character-consistency paragraph, reference-image instructions, or any other rule from CHARACTER REFERENCES anywhere else in the output — state each rule once, in its correct section, and nowhere else:
 
 The very first line of the entire output is the TITLE itself, in plain caps, nothing before it — no heading word, just the title (e.g. "CINEMATIC FAMILY DRAMA", or for a series episode "EPISODE 2 — [on-brand title]" per SERIES MODE below).
@@ -411,7 +417,7 @@ export default async function handler(req, res) {
   console.log('[handler]', jobId, 'new job, mode=', params.mode);
 
   try {
-    await kv.set(jobId, { status: 'pending' }, { ex: 3600 });
+    await kv.set(jobId, { status: 'pending', createdAt: Date.now() }, { ex: 3600 });
     console.log('[handler]', jobId, 'kv set to pending OK');
   } catch (err) {
     console.error('[handler]', jobId, 'kv set to pending FAILED', err && err.stack ? err.stack : err);

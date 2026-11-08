@@ -367,12 +367,17 @@ async function runGeneration(params) {
     const planText = await generateSeriesPlan(params);
     return { text: planText, seriesPlan: planText };
   }
+  const runStartedAt = Date.now();
   const { system, userPrompt } = buildPrompt(params);
   let text = await callAnthropic(system, userPrompt, 2000, params.mode || 'single');
 
   // One bounded, deterministic-constraint-triggered retry — never a loop, never for subjective quality.
   const validation = validateStory(text, params);
-  if (!validation.ok) {
+  // The function has a hard time limit. A retry only runs if the first attempt was quick enough to finish safely.
+  const RETRY_TIME_BUDGET_MS = 20000;
+  if (!validation.ok && Date.now() - runStartedAt > RETRY_TIME_BUDGET_MS) {
+    console.warn('[runGeneration] validation failed but too slow to retry safely, returning first attempt:', validation.issues);
+  } else if (!validation.ok) {
     console.warn('[runGeneration] validation failed, retrying once:', validation.issues);
     const correctiveUserPrompt = `${userPrompt}\n\nIMPORTANT — your previous attempt failed these checks, fix them in this rewrite while keeping everything else about the story's quality:\n${validation.issues.map(i => `- ${i}`).join('\n')}`;
     const retryText = await callAnthropic(system, correctiveUserPrompt, 2000, (params.mode || 'single') + '-retry');
@@ -447,4 +452,5 @@ export default async function handler(req, res) {
   console.log('[handler]', jobId, 'returning jobId to client now');
   return res.status(200).json({ jobId });
 }
+
 

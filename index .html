@@ -265,28 +265,36 @@ function handleAccessDenied() {
 
 const POLL_INTERVAL = 3000;
 
-const MAX_WAIT_MS = 120000;
+// The server marks a stuck job as failed after about 75 seconds, so this is only a safety net.
+const MAX_WAIT_MS = 300000;
+// After the phone was locked or the app was in the background, the first request can fail
+// while the connection wakes up. Retry a few times before giving up.
+const MAX_FAILS = 8;
 
 function pollJob(jobId, { onDone, onError, onTick }) {
   let stopped = false;
   let inFlight = false;
   let timer = null;
+  let fails = 0;
   const startedAt = Date.now();
+  function schedule() {
+    if (!stopped) timer = setTimeout(check, POLL_INTERVAL);
+  }
   async function check() {
     if (stopped || inFlight) return;
     inFlight = true;
     if (timer) { clearTimeout(timer); timer = null; }
     try {
-      // Always ask the server first. If the phone was locked or the app was in the background,
-      // the story may already be finished, so never give up before checking.
-      const res = await fetch(`/api/status?jobId=${jobId}`);
+      const res = await fetch(`/api/status?jobId=${jobId}`, { cache: 'no-store' });
       if (res.status === 404) {
         stopped = true;
         onError('This story expired. Please try again.');
         return;
       }
+      if (!res.ok) throw new Error('status ' + res.status);
       const data = await res.json();
       if (stopped) return;
+      fails = 0;
       if (data.status === 'done') {
         stopped = true;
         onDone(data);
@@ -298,15 +306,16 @@ function pollJob(jobId, { onDone, onError, onTick }) {
         onError('This took too long. Please try again.');
       } else {
         if (onTick) onTick(data);
-        if (!stopped) timer = setTimeout(check, POLL_INTERVAL);
+        schedule();
       }
     } catch (err) {
       if (stopped) return;
-      if (Date.now() - startedAt > MAX_WAIT_MS) {
+      fails += 1;
+      if (fails >= MAX_FAILS) {
         stopped = true;
-        onError('This took too long. Please try again.');
+        onError('Connection problem. Please check your internet and try again.');
       } else {
-        timer = setTimeout(check, POLL_INTERVAL);
+        schedule();
       }
     } finally {
       inFlight = false;
@@ -314,7 +323,7 @@ function pollJob(jobId, { onDone, onError, onTick }) {
   }
   check();
   const visHandler = () => {
-    if (!stopped && document.visibilityState === 'visible') check();
+    if (!stopped && document.visibilityState === 'visible') { fails = 0; check(); }
   };
   document.addEventListener('visibilitychange', visHandler);
   return () => {

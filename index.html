@@ -277,11 +277,8 @@ function pollJob(jobId, { onDone, onError, onTick }) {
     inFlight = true;
     if (timer) { clearTimeout(timer); timer = null; }
     try {
-      if (Date.now() - startedAt > MAX_WAIT_MS) {
-        stopped = true;
-        onError('This took too long. Please try again.');
-        return;
-      }
+      // Always ask the server first. If the phone was locked or the app was in the background,
+      // the story may already be finished, so never give up before checking.
       const res = await fetch(`/api/status?jobId=${jobId}`);
       if (res.status === 404) {
         stopped = true;
@@ -296,12 +293,21 @@ function pollJob(jobId, { onDone, onError, onTick }) {
       } else if (data.status === 'error') {
         stopped = true;
         onError(data.error || 'Unknown error');
+      } else if (Date.now() - startedAt > MAX_WAIT_MS) {
+        stopped = true;
+        onError('This took too long. Please try again.');
       } else {
         if (onTick) onTick(data);
         if (!stopped) timer = setTimeout(check, POLL_INTERVAL);
       }
     } catch (err) {
-      if (!stopped) timer = setTimeout(check, POLL_INTERVAL);
+      if (stopped) return;
+      if (Date.now() - startedAt > MAX_WAIT_MS) {
+        stopped = true;
+        onError('This took too long. Please try again.');
+      } else {
+        timer = setTimeout(check, POLL_INTERVAL);
+      }
     } finally {
       inFlight = false;
     }
@@ -492,6 +498,7 @@ signatureBtn.addEventListener('click', () => activateMode({ btn: signatureBtn, s
 const sigSelect = document.getElementById('sig-select');
 const sigOutput = document.getElementById('sig-output');
 const prompts = window.SIGNATURE_PROMPTS || [];
+if (prompts.length === 0) signatureBtn.style.display = 'none'; // hidden until new signature prompts are added
 
 prompts.forEach((p, i) => {
   const opt = document.createElement('option');

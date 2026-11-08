@@ -19,9 +19,9 @@ export default async function handler(req, res) {
     if (!job) {
       return res.status(404).json({ error: 'Job not found' });
     }
-    // A job still pending after 2 minutes means the background run was cut off
+    // A job still pending after about 75 seconds means the background run was cut off
     // (e.g. the function time limit). Report it as failed so the page unlocks.
-    if (job.status === 'pending' && job.createdAt && Date.now() - job.createdAt > 110000) {
+    if (job.status === 'pending' && job.createdAt && Date.now() - job.createdAt > 75000) {
       return res.status(200).json({ status: 'error', error: 'Generation timed out. Please try again.' });
     }
     return res.status(200).json(job);

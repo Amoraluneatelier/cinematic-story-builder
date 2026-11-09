@@ -270,8 +270,8 @@ const POLL_INTERVAL = 3000;
 const MAX_WAIT_MS = 300000;
 // After the phone was locked or the app was in the background, the first request can fail
 // while the connection wakes up. Retry a few times before giving up.
-const MAX_FAILS = 8;
-const PAGE_VERSION = 'v3 (9 nov)';
+const MAX_FAILS = 10;
+const PAGE_VERSION = 'v4 (9 nov)';
 document.getElementById('ver').textContent = 'Page version ' + PAGE_VERSION;
 
 function pollJob(jobId, { onDone, onError, onTick }) {
@@ -286,6 +286,8 @@ function pollJob(jobId, { onDone, onError, onTick }) {
   }
   async function check() {
     if (stopped || inFlight) return;
+    // While the app is in the background the phone blocks the network. Wait quietly until the page is visible again.
+    if (document.visibilityState === 'hidden') { schedule(); return; }
     inFlight = true;
     if (timer) { clearTimeout(timer); timer = null; }
     try {
@@ -315,11 +317,13 @@ function pollJob(jobId, { onDone, onError, onTick }) {
       }
     } catch (err) {
       if (stopped) return;
+      // A failure while the page is hidden is expected and does not count.
+      if (document.visibilityState === 'hidden') { schedule(); return; }
       fails += 1;
       if (!String(lastInfo).startsWith('http')) lastInfo = 'network: ' + String(err && err.message ? err.message : err);
       if (fails >= MAX_FAILS) {
         stopped = true;
-        onError('Connection problem. Please check your internet and try again. [' + lastInfo + ']');
+        onError('Connection problem. Please reload this page to check on your story. [' + lastInfo + ']', true);
       } else {
         schedule();
       }
@@ -451,10 +455,10 @@ document.getElementById('go').addEventListener('click', async () => {
         btn.disabled = false;
         status.style.display = 'none';
       },
-      onError: (err) => {
+      onError: (err, keepJob) => {
         output.innerHTML = '<div class="card-meta">Error: ' + err + '</div>';
         output.style.display = 'block';
-        localStorage.removeItem('activeStoryJob');
+        if (!keepJob) localStorage.removeItem('activeStoryJob');
         btn.disabled = false;
         status.style.display = 'none';
       }
@@ -545,4 +549,3 @@ if (prompts.length > 0) showSignaturePrompt(0);
 </script>
 </body>
 </html>
-

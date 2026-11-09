@@ -190,6 +190,7 @@
     <div class="leave-note">You can lock your phone or switch apps now — your story keeps writing. Come back to this page any time to see it.</div>
     <div id="output"></div>
     <div class="make-it-yours"><b>A Little Note About AI Creativity</b>Cinematic Studio is powered by AI, which means every story is uniquely generated and results may vary. While our story engine is designed to create detailed, cinematic prompts, occasional inconsistencies or unexpected results can occur. We recommend reviewing your story before using it in your preferred AI video generator. If a story doesn't match your vision, try generating a new one.</div>
+    <div class="leave-note" id="ver"></div>
   </div>
 
   <div id="signature-section" style="display:none;">
@@ -265,28 +266,40 @@ function handleAccessDenied() {
 
 const POLL_INTERVAL = 3000;
 
-const MAX_WAIT_MS = 120000;
+// The server marks a stuck job as failed after about 75 seconds, so this is only a safety net.
+const MAX_WAIT_MS = 300000;
+// After the phone was locked or the app was in the background, the first request can fail
+// while the connection wakes up. Retry a few times before giving up.
+const MAX_FAILS = 8;
+const PAGE_VERSION = 'v3 (9 nov)';
+document.getElementById('ver').textContent = 'Page version ' + PAGE_VERSION;
 
 function pollJob(jobId, { onDone, onError, onTick }) {
   let stopped = false;
   let inFlight = false;
   let timer = null;
+  let fails = 0;
+  let lastInfo = 'no response yet';
   const startedAt = Date.now();
+  function schedule() {
+    if (!stopped) timer = setTimeout(check, POLL_INTERVAL);
+  }
   async function check() {
     if (stopped || inFlight) return;
     inFlight = true;
     if (timer) { clearTimeout(timer); timer = null; }
     try {
-      // Always ask the server first. If the phone was locked or the app was in the background,
-      // the story may already be finished, so never give up before checking.
-      const res = await fetch(`/api/status?jobId=${jobId}`);
+      const res = await fetch(`/api/status?jobId=${jobId}`, { cache: 'no-store' });
       if (res.status === 404) {
         stopped = true;
         onError('This story expired. Please try again.');
         return;
       }
+      if (!res.ok) { lastInfo = 'http ' + res.status; throw new Error('status ' + res.status); }
       const data = await res.json();
       if (stopped) return;
+      fails = 0;
+      lastInfo = 'status=' + data.status + ' age=' + (data.createdAt ? Math.round((Date.now() - data.createdAt) / 1000) + 's' : 'n/a');
       if (data.status === 'done') {
         stopped = true;
         onDone(data);
@@ -295,18 +308,20 @@ function pollJob(jobId, { onDone, onError, onTick }) {
         onError(data.error || 'Unknown error');
       } else if (Date.now() - startedAt > MAX_WAIT_MS) {
         stopped = true;
-        onError('This took too long. Please try again.');
+        onError('This took too long. Please try again. [' + lastInfo + ']');
       } else {
         if (onTick) onTick(data);
-        if (!stopped) timer = setTimeout(check, POLL_INTERVAL);
+        schedule();
       }
     } catch (err) {
       if (stopped) return;
-      if (Date.now() - startedAt > MAX_WAIT_MS) {
+      fails += 1;
+      if (!String(lastInfo).startsWith('http')) lastInfo = 'network: ' + String(err && err.message ? err.message : err);
+      if (fails >= MAX_FAILS) {
         stopped = true;
-        onError('This took too long. Please try again.');
+        onError('Connection problem. Please check your internet and try again. [' + lastInfo + ']');
       } else {
-        timer = setTimeout(check, POLL_INTERVAL);
+        schedule();
       }
     } finally {
       inFlight = false;
@@ -314,7 +329,7 @@ function pollJob(jobId, { onDone, onError, onTick }) {
   }
   check();
   const visHandler = () => {
-    if (!stopped && document.visibilityState === 'visible') check();
+    if (!stopped && document.visibilityState === 'visible') { fails = 0; check(); }
   };
   document.addEventListener('visibilitychange', visHandler);
   return () => {
@@ -530,3 +545,4 @@ if (prompts.length > 0) showSignaturePrompt(0);
 </script>
 </body>
 </html>
+

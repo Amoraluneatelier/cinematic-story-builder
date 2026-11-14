@@ -202,15 +202,13 @@
 
 <script src="signature-prompts.js"></script>
 <script>
-function getAccessCode() {
-  try { return localStorage.getItem('accessCode') || ''; } catch (e) { return ''; }
-}
-function setAccessCode(code) {
-  try { localStorage.setItem('accessCode', code); } catch (e) {}
-}
-function clearAccessCode() {
-  try { localStorage.removeItem('accessCode'); } catch (e) {}
-}
+// The code is kept in memory only (not saved on the device), so it must be entered on every visit.
+let accessCodeInMemory = '';
+function getAccessCode() { return accessCodeInMemory; }
+function setAccessCode(code) { accessCodeInMemory = code; }
+function clearAccessCode() { accessCodeInMemory = ''; }
+// Remove a code that an earlier page version saved on this device.
+try { localStorage.removeItem('accessCode'); } catch (e) {}
 
 async function tryUnlock(code, { onFail } = {}) {
   try {
@@ -238,15 +236,7 @@ function showGate() {
 }
 
 (function initGate() {
-  const savedCode = getAccessCode();
-  if (savedCode) {
-    // Optimistic: trust the saved code immediately so the page doesn't flash a lock screen on every visit.
-    // It is still re-verified for real on the next actual /api/start call (see handleAccessDenied below).
-    document.getElementById('main-wrap').style.display = 'block';
-    document.getElementById('gate-overlay').style.display = 'none';
-  } else {
-    showGate();
-  }
+  showGate();
   document.getElementById('gate-submit').addEventListener('click', async () => {
     const code = document.getElementById('gate-code').value.trim();
     const errEl = document.getElementById('gate-error');
@@ -271,7 +261,7 @@ const MAX_WAIT_MS = 300000;
 // After the phone was locked or the app was in the background, the first request can fail
 // while the connection wakes up. Retry a few times before giving up.
 const MAX_FAILS = 10;
-const PAGE_VERSION = 'v4 (9 nov)';
+const PAGE_VERSION = 'v5 (13 nov)';
 document.getElementById('ver').textContent = 'Page version ' + PAGE_VERSION;
 
 function pollJob(jobId, { onDone, onError, onTick }) {

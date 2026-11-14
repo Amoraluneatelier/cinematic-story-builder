@@ -190,6 +190,7 @@
     <div class="leave-note">You can lock your phone or switch apps now — your story keeps writing. Come back to this page any time to see it.</div>
     <div id="output"></div>
     <div class="make-it-yours"><b>A Little Note About AI Creativity</b>Cinematic Studio is powered by AI, which means every story is uniquely generated and results may vary. While our story engine is designed to create detailed, cinematic prompts, occasional inconsistencies or unexpected results can occur. We recommend reviewing your story before using it in your preferred AI video generator. If a story doesn't match your vision, try generating a new one.</div>
+    <div class="leave-note" id="ver"></div>
   </div>
 
   <div id="signature-section" style="display:none;">
@@ -201,15 +202,13 @@
 
 <script src="signature-prompts.js"></script>
 <script>
-function getAccessCode() {
-  try { return localStorage.getItem('accessCode') || ''; } catch (e) { return ''; }
-}
-function setAccessCode(code) {
-  try { localStorage.setItem('accessCode', code); } catch (e) {}
-}
-function clearAccessCode() {
-  try { localStorage.removeItem('accessCode'); } catch (e) {}
-}
+// The code is kept in memory only (not saved on the device), so it must be entered on every visit.
+let accessCodeInMemory = '';
+function getAccessCode() { return accessCodeInMemory; }
+function setAccessCode(code) { accessCodeInMemory = code; }
+function clearAccessCode() { accessCodeInMemory = ''; }
+// Remove a code that an earlier page version saved on this device.
+try { localStorage.removeItem('accessCode'); } catch (e) {}
 
 async function tryUnlock(code, { onFail } = {}) {
   try {
@@ -237,15 +236,7 @@ function showGate() {
 }
 
 (function initGate() {
-  const savedCode = getAccessCode();
-  if (savedCode) {
-    // Optimistic: trust the saved code immediately so the page doesn't flash a lock screen on every visit.
-    // It is still re-verified for real on the next actual /api/start call (see handleAccessDenied below).
-    document.getElementById('main-wrap').style.display = 'block';
-    document.getElementById('gate-overlay').style.display = 'none';
-  } else {
-    showGate();
-  }
+  showGate();
   document.getElementById('gate-submit').addEventListener('click', async () => {
     const code = document.getElementById('gate-code').value.trim();
     const errEl = document.getElementById('gate-error');
@@ -269,19 +260,24 @@ const POLL_INTERVAL = 3000;
 const MAX_WAIT_MS = 300000;
 // After the phone was locked or the app was in the background, the first request can fail
 // while the connection wakes up. Retry a few times before giving up.
-const MAX_FAILS = 8;
+const MAX_FAILS = 10;
+const PAGE_VERSION = 'v5 (13 nov)';
+document.getElementById('ver').textContent = 'Page version ' + PAGE_VERSION;
 
 function pollJob(jobId, { onDone, onError, onTick }) {
   let stopped = false;
   let inFlight = false;
   let timer = null;
   let fails = 0;
+  let lastInfo = 'no response yet';
   const startedAt = Date.now();
   function schedule() {
     if (!stopped) timer = setTimeout(check, POLL_INTERVAL);
   }
   async function check() {
     if (stopped || inFlight) return;
+    // While the app is in the background the phone blocks the network. Wait quietly until the page is visible again.
+    if (document.visibilityState === 'hidden') { schedule(); return; }
     inFlight = true;
     if (timer) { clearTimeout(timer); timer = null; }
     try {
@@ -291,10 +287,11 @@ function pollJob(jobId, { onDone, onError, onTick }) {
         onError('This story expired. Please try again.');
         return;
       }
-      if (!res.ok) throw new Error('status ' + res.status);
+      if (!res.ok) { lastInfo = 'http ' + res.status; throw new Error('status ' + res.status); }
       const data = await res.json();
       if (stopped) return;
       fails = 0;
+      lastInfo = 'status=' + data.status + ' age=' + (data.createdAt ? Math.round((Date.now() - data.createdAt) / 1000) + 's' : 'n/a');
       if (data.status === 'done') {
         stopped = true;
         onDone(data);
@@ -303,17 +300,20 @@ function pollJob(jobId, { onDone, onError, onTick }) {
         onError(data.error || 'Unknown error');
       } else if (Date.now() - startedAt > MAX_WAIT_MS) {
         stopped = true;
-        onError('This took too long. Please try again.');
+        onError('This took too long. Please try again. [' + lastInfo + ']');
       } else {
         if (onTick) onTick(data);
         schedule();
       }
     } catch (err) {
       if (stopped) return;
+      // A failure while the page is hidden is expected and does not count.
+      if (document.visibilityState === 'hidden') { schedule(); return; }
       fails += 1;
+      if (!String(lastInfo).startsWith('http')) lastInfo = 'network: ' + String(err && err.message ? err.message : err);
       if (fails >= MAX_FAILS) {
         stopped = true;
-        onError('Connection problem. Please check your internet and try again.');
+        onError('Connection problem. Please reload this page to check on your story. [' + lastInfo + ']', true);
       } else {
         schedule();
       }
@@ -445,10 +445,10 @@ document.getElementById('go').addEventListener('click', async () => {
         btn.disabled = false;
         status.style.display = 'none';
       },
-      onError: (err) => {
+      onError: (err, keepJob) => {
         output.innerHTML = '<div class="card-meta">Error: ' + err + '</div>';
         output.style.display = 'block';
-        localStorage.removeItem('activeStoryJob');
+        if (!keepJob) localStorage.removeItem('activeStoryJob');
         btn.disabled = false;
         status.style.display = 'none';
       }

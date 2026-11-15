@@ -102,7 +102,7 @@ LOCATION & ATMOSPHERE
 A specific, sensory-rich real-world-feeling setting, described with concrete details, and how the location participates in the story (per USE THE ENVIRONMENT above) — not just how it looks.
 
 SCENE-BY-SCENE STORY
-A timestamped breakdown (e.g. "0–6 SEC — THE DOOR"). For EACH scene, give these labeled lines, in this order, and omit a line entirely when it genuinely doesn't apply (never pad it):
+A timestamped breakdown (e.g. "0–6 SEC — THE DOOR"). TIMESTAMPS ARE CONTINUOUS: the first scene starts at 0, and every following scene starts at the exact second the previous scene ends (for example 0–6 SEC, 6–13 SEC, 13–20 SEC, 20–30 SEC) — never a gap (not 0–6 then 7–14) and never an overlap. The last scene ends at exactly the selected duration. Choose the scene lengths yourself to fit the story and genre pacing. For EACH scene, give these labeled lines, in this order, and omit a line entirely when it genuinely doesn't apply (never pad it):
 ACTION: the concrete event(s) and connected movement in service of one objective (see ONE DRAMATIC OBJECTIVE PER SEGMENT above).
 DIALOGUE: only the lines actually spoken in this scene, realistic for its length — omit this line entirely if nobody speaks in this scene.
 CAMERA: a single clear camera instruction for this scene (see AI-VIDEO-FRIENDLY SCENE LOAD above).
@@ -163,7 +163,7 @@ STORY LOGIC & AI VIDEO FEASIBILITY CHECK — MANDATORY FINAL GATE, NOT OPTIONAL:
 6. AI VIDEO FEASIBILITY — THE DECIDING FACTOR: for every single scene, ask "could a real AI video generator actually render this as one coherent 5-6 second clip?" Reject and rewrite any scene that depends on: more than one camera instruction stacked together; multiple unrelated simultaneous actions; split-second precision timing between two things happening; more dialogue than a character could naturally say in the scene's time window; an important beat resting on subtle micro-expression alone; or a complex phone/screen interaction. A visually or emotionally impressive scene that a generator would likely render as broken, garbled or incoherent is a failure, no matter how good the prose is — simplify the staging without losing the story beat.
 7. READABLE TEXT DEPENDENCY: never make an essential clue, reveal, joke, twist or payoff depend on AI-generated readable text.
 8. GENRE LOGIC: story mechanics must fit the selected genre's internal logic, not only its visual aesthetic.
-9. DURATION: count the final scene's end timestamp — it must exactly equal the customer's selected duration (see STRICT DURATION COMPLIANCE above). Fix immediately if not.
+9. DURATION: the timestamps must be continuous (first scene starts at 0, each scene starts exactly where the previous one ends, no gaps or overlaps), and count the final scene's end timestamp — it must exactly equal the customer's selected duration (see STRICT DURATION COMPLIANCE above). Fix immediately if not.
 10. CHARACTER COUNT: count every acting/speaking entity in the draft (see STRICT CHARACTER COUNT above) — it must exactly equal the customer's selected character count. Fix immediately if not.
 11. ENDING TYPE: confirm the ending actually satisfies the specific rules for the customer's selected ending type (see ENDING-SPECIFIC QUALITY RULES above), not just a generic satisfying wrap-up.
 12. NEGATIVE PROMPT CONSISTENCY: confirm the negative prompt does not contradict anything the scenes actually require (see CONTRADICTION CHECK above).
@@ -366,6 +366,24 @@ function validateStory(text, params) {
   return { ok: issues.length === 0, issues };
 }
 
+// Makes scene timestamps continuous: each scene starts exactly where the previous one ends.
+// It only changes the START number of a scene heading line (for example "7–14 SEC" becomes "6–14 SEC"
+// when the previous scene ended at 6). Nothing else in the story is touched.
+function normalizeTimestamps(text) {
+  if (typeof text !== 'string') return text;
+  let prevEnd = null;
+  return text.replace(/^([ \t]*(?:[*#>\-•]+[ \t]*)*)(\d{1,3})([ \t]*[-–—][ \t]*)(\d{1,3})([ \t]*SEC)/gim, (match, lead, start, dash, end, tail) => {
+    const s = Number(start);
+    const e = Number(end);
+    let newStart = s;
+    if (prevEnd === null) { newStart = 0; }
+    else { newStart = prevEnd; }
+    if (newStart >= e) { newStart = s; } // never produce an empty or reversed scene; leave it as written
+    prevEnd = e;
+    return lead + String(newStart) + dash + end + tail;
+  });
+}
+
 async function runGeneration(params) {
   console.log('[runGeneration] mode=', params.mode, 'episodeNumber=', params.episodeNumber);
   if (params.mode === 'series-plan') {
@@ -398,6 +416,7 @@ async function runGeneration(params) {
     }
   }
 
+  text = normalizeTimestamps(text);
   return { text, seriesPlan: params.seriesPlan || '' };
 }
 
@@ -463,5 +482,4 @@ export default async function handler(req, res) {
   console.log('[handler]', jobId, 'returning jobId to client now');
   return res.status(200).json({ jobId });
 }
-
 
